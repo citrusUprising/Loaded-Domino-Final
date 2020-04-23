@@ -4,7 +4,8 @@ class Play extends Phaser.Scene{
     }
     
     preload(){
-
+		//load assets
+		
     }
 
     create(){

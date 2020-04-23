@@ -8,10 +8,10 @@
 
 
 let config = {
-type: Phaser.CANVAS, /*Loads 2d web renderer*/
-width: 960, /*game width (adjustable)*/
-height: 540, /*game height (adjustable)*/
-scene: [ Menu, Tutorial, Play ],
+	type: Phaser.CANVAS, /*Loads 2d web renderer*/
+	width: 960, /*game width (adjustable)*/
+	height: 540, /*game height (adjustable)*/
+	scene: [ Menu, Tutorial, Play ]
 };
 
 let game = new Phaser.Game(config);
