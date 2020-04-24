@@ -5,20 +5,25 @@ class Play extends Phaser.Scene{
     
     preload(){
 		// load temp images
-		this.load.image("player", "assets/player-temp.png");
-		this.load.image("platform", "assets/platform-temp.png");
+		this.load.image("player", "assets/char.png");
+        this.load.image("platform", "assets/rampsmall.png");
+        this.load.image("backDrop", "assets/ware.png");
     }
 
     create(){
-		
+
+        this.background = this.add.tileSprite(0, 0, 960, 540, "backDrop").setOrigin(0,0);
+        this.scroll = 1; //speed of scrolling
+        
+
 		// group for platform collisions
 		this.platforms = this.physics.add.group(); //shift to platform class??
-		this.platforms.create(400, 400, "platform").setScale(4);
+		this.platforms.create(400, 400, "platform").setScale(1);
 		
 		// iterate through platforms group, set variables
 		this.platforms.children.each(function(platform) {
 			platform.body.allowGravity = false;
-			platform.body.immovable = true;
+            platform.body.immovable = true;
 			platform.setFrictionX(1);
 		}, this);
 
@@ -43,6 +48,8 @@ class Play extends Phaser.Scene{
     }
 
     update(){
+
+        this.background.tilePositionY += this.scroll;
 		
 		// check if player died
 		if (this.player.y < 0) {//to be changed to collision with ooze
