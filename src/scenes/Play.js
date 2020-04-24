@@ -12,7 +12,7 @@ class Play extends Phaser.Scene{
     create(){
 		
 		// group for platform collisions
-		this.platforms = this.physics.add.group();
+		this.platforms = this.physics.add.group(); //shift to platform class??
 		this.platforms.create(400, 400, "platform").setScale(4);
 		
 		// iterate through platforms group, set variables
