@@ -6,9 +6,13 @@ class Menu extends Phaser.Scene{
     preload(){
         /*this.load.audio('name', 'path');*/
         /*this.load.image('name', 'path');*/
+        this.load.image('title', './assets/tempTitle.png');
+        this.load.image('back', './assets/tempBack.png');
     }
     
     create(){
+
+        this.backdrop = this.add.tileSprite(0, 0, 960, 540, "back").setOrigin(0,0);
 
         let titleConfig = {
             fontFamily: 'Helvetica',
@@ -41,8 +45,12 @@ class Menu extends Phaser.Scene{
         let centerY = game.config.height/2;
         let textSpacer = 80;
 
-        this.add.text(centerX, centerY-2*textSpacer, 
-            'SHELVING CRISIS', titleConfig).setOrigin(0.5);
+        this.titleCard = this.add.tileSprite
+        (game.config.width/2, game.config.height/2-2*textSpacer, 470, 212, "title")
+        .setOrigin(.5,.5);
+
+       /* this.add.text(centerX, centerY-2*textSpacer, 
+            'SHELVING CRISIS', titleConfig).setOrigin(0.5);*/
         this.add.text(centerX, centerY, 
             'Press ← to start Tutorial', menuConfig).setOrigin(0.5);
         this.add.text(centerX, centerY+textSpacer, 
@@ -63,6 +71,10 @@ class Menu extends Phaser.Scene{
             //this.sound.play('name');
             this.scene.start("playScene");
         }
+
+        this.backdrop.tilePositionX -= 2;
+        this.backdrop.tilePositionY -= 1;
+        this.titleCard.tilePositionX +=3;
     }
 
 }
