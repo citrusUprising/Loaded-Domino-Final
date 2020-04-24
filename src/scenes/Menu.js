@@ -14,7 +14,7 @@ class Menu extends Phaser.Scene{
 
         this.backdrop = this.add.tileSprite(0, 0, 960, 540, "back").setOrigin(0,0);
 
-        let titleConfig = {
+       /* let titleConfig = {
             fontFamily: 'Helvetica',
             fontSize: '60px',
             backgroundColor: '#000000',
@@ -25,7 +25,7 @@ class Menu extends Phaser.Scene{
                 bottom: 10,
             },
             fixedWidth: 0
-        }
+        }*/
 
         let menuConfig = {
             fontFamily: 'Helvetica',

@@ -34,9 +34,10 @@ class Play extends Phaser.Scene{
 		// add collisions
         this.physics.add.collider(this.player, this.platforms);
         
-        this.gameoverTop = false;
+        this.gameoverTop = false;//seperate gameover variables depending on death
         this.gameoverBot = false;
 
+        keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 		
     }
@@ -44,7 +45,7 @@ class Play extends Phaser.Scene{
     update(){
 		
 		// check if player died
-		if (this.player.y < 0) {
+		if (this.player.y < 0) {//to be changed to collision with ooze
             console.log("game over, eaten by void"); //prints infinitely, adjust
             this.gameoverTop=true;
 			//this.scene.restart();
@@ -62,6 +63,9 @@ class Play extends Phaser.Scene{
             this.player.body.allowGravity = false;
             if(Phaser.Input.Keyboard.JustDown(keyRIGHT)){
                 this.scene.restart();
+            }
+            if(Phaser.Input.Keyboard.JustDown(keyLEFT)){//returns to menu
+                this.scene.start("menuScene");
             }
         }
 
