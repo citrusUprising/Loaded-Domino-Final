@@ -32,7 +32,11 @@ class Play extends Phaser.Scene{
 		this.player.body.bounce.y = 0.5;
 
 		// add collisions
-		this.physics.add.collider(this.player, this.platforms);
+        this.physics.add.collider(this.player, this.platforms);
+        
+        this.gameover = false;
+
+        keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 		
     }
 
@@ -40,12 +44,25 @@ class Play extends Phaser.Scene{
 		
 		// check if player died
 		if (this.player.y < 0) {
-			console.log("game over, eaten by void");
-			this.scene.restart();
+            console.log("game over, eaten by void"); //prints infinitely, adjust
+            this.gameover=true;
+			//this.scene.restart();
 		} else if (this.player.y > game.config.height) {
-			console.log("game over, fell of screen");
-			this.scene.restart();
-		}
+            console.log("game over, fell of screen"); //prints infinitely, adjust
+            this.gameover=true;
+			//this.scene.restart();
+        }
+        
+        if (this.gameover){ //gameover, turns off player movement, allows scene to be reset with right arrow key
+            this.player.body.velocity.x = 0;
+		    this.player.body.velocity.y = 0;
+		    this.player.body.bounce.x = 0;
+            this.player.body.bounce.y = 0;
+            this.player.body.allowGravity = false;
+            if(Phaser.Input.Keyboard.JustDown(keyRIGHT)){
+                this.scene.restart();
+            }
+        }
 
     }
 }

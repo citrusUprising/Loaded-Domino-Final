@@ -46,7 +46,7 @@ class Menu extends Phaser.Scene{
         let textSpacer = 80;
 
         this.titleCard = this.add.tileSprite
-        (game.config.width/2, game.config.height/2-2*textSpacer, 470, 212, "title")
+        (game.config.width/2, game.config.height/2-2*textSpacer, 470, 175, "title")
         .setOrigin(.5,.5);
 
        /* this.add.text(centerX, centerY-2*textSpacer, 
