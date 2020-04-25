@@ -27,21 +27,27 @@ class Play extends Phaser.Scene{
 			platform.setFrictionX(1);
 		}, this);
 
+        this.physics.world.setBounds(0, -100, game.config.width, game.config.height+200);//sets world bounds with vertical pockets for game over
+
 		// add player with physics
-		this.player = new Player(this, 20, 20, "player", 0);
+		this.player = new Player(this, 150, 150, "player", 0);
 		this.physics.add.existing(this.player);
 		
 		this.player.body.velocity.x = 150;
 		this.player.body.velocity.y = 100;
 		this.player.body.bounce.x = 0.2;
-		this.player.body.bounce.y = 0.5;
+        this.player.body.bounce.y = 0.1;
+        //this.player.body.maxVelocity = 200;
+        this.player.body.collideWorldBounds = true; //currently prevents player from falling through world bottom, remedy
 
 		// add collisions
         this.physics.add.collider(this.player, this.platforms);
+        this.isCollided = this.physics.world.collide(this.player, this.platform);
         
         this.gameoverTop = false;//seperate gameover variables depending on death
         this.gameoverBot = false;
 
+        keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
 		
@@ -49,10 +55,26 @@ class Play extends Phaser.Scene{
 
     update(){
 
-        this.background.tilePositionY += this.scroll;
-		
+        if (!this.gameoverTop&&!this.gameoverBot){ //updates scrolling background
+            this.background.tilePositionY += this.scroll;
+            this.player.update();
+          }
+
+          this.isCollided = this.physics.world.collide(this.player, this.platform);//does not change to true flag
+          //console.log(this.isCollided);
+          if(this.isCollided) this.player.isJump = false;
+          else this.player.isJump = true;
+          //add code to change this.player.isJump to false when colliding with a platform and true otherwise
+
+          if(this.player.isTurn){ //flips sprite when player turns
+            console.log('turning');
+            //this.player.anchor.setTo(.5,.5); //code currently broken
+            //this.player.scale.x *= -1; //user hackenstein on html5gamedevs.com https://www.html5gamedevs.com/topic/1582-horizontal-sprite-flip/
+            this.player.isTurn = false;
+        }
+          
 		// check if player died
-		if (this.player.y < 0) {//to be changed to collision with ooze
+		if (this.player.y < 0) {//to be changed to collision with ooze //(this.player.body.overlapY>0)
             console.log("game over, eaten by void"); //prints infinitely, adjust
             this.gameoverTop=true;
 			//this.scene.restart();

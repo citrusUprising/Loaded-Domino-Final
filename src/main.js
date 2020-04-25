@@ -28,4 +28,4 @@ game.settings = {
 
 }
 
-let keyLEFT, keyRIGHT; //keys used
+let keyLEFT, keyRIGHT, keySPACE; //keys used
