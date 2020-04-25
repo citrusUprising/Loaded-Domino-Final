@@ -3,9 +3,8 @@ class Player extends Phaser.GameObjects.Sprite{
         super(scene, x, y, texture, frame);
 
         scene.add.existing(this);
-        this.speed = 200;
         this.speedUp = 400;
-        this.isJump = true;
+        this.isJump = true; 
         this.isTurn = true;
         this.isRight = true;
 
@@ -23,7 +22,7 @@ class Player extends Phaser.GameObjects.Sprite{
             this.isRight = true;
         }
        
-        if(!keyLEFT.isDown && !keyRIGHT.isDown){//player will skow to a stop with no input
+        if(!keyLEFT.isDown && !keyRIGHT.isDown){//player will slow to a stop with no input
             if(this.body.velocity.x < 0)this.body.acceleration.x=this.speedUp;
             if(this.body.velocity.x > 0)this.body.acceleration.x=-this.speedUp; 
         } 

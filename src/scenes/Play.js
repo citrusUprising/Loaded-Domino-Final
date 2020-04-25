@@ -74,11 +74,11 @@ class Play extends Phaser.Scene{
         }
           
 		// check if player died
-		if (this.player.y < 0) {//to be changed to collision with ooze //(this.player.body.overlapY>0)
+		if (this.player.y < -50) {//to be changed to collision with ooze //(this.player.body.overlapY>0)
             console.log("game over, eaten by void"); //prints infinitely, adjust
             this.gameoverTop=true;
 			//this.scene.restart();
-		} else if (this.player.y > game.config.height) {
+		} else if (this.player.y > game.config.height+50) {
             console.log("game over, fell of screen"); //prints infinitely, adjust
             this.gameoverBot=true;
 			//this.scene.restart();
