@@ -16,7 +16,7 @@ let config = {
 		default: "arcade",
 		arcade: {
 			gravity: {
-				y: 200
+				y: 700
 			}
 		}
     },
@@ -28,4 +28,5 @@ game.settings = {
 
 }
 
-let keyLEFT, keyRIGHT, keySPACE; //keys used
+// define key constants
+let keyLEFT, keyRIGHT, keySPACE;
