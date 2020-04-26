@@ -16,7 +16,8 @@ class Play extends Phaser.Scene {
         // create warehouse backdrop
         this.background = this.add.tileSprite(0, 0, 960, 540, "backDrop").setOrigin(0,0);
         //speed of scrolling
-        this.scroll = 1;         
+        this.scroll = 1;
+        this.platMod = -60;         
 
 		// group for platform collisions
         this.platforms = this.physics.add.group(); //shift to platform class??
@@ -28,13 +29,13 @@ class Play extends Phaser.Scene {
 		this.platforms.children.each(function(platform) {
 			platform.body.allowGravity = false;
             platform.body.immovable = true;
-            platform.body.velocity.y = -100;
+            platform.body.velocity.y = this.platMod*this.scroll;
             platform.setFrictionX(1);
 		}, this);
 
         // add timer for spawning platforms (possibly temporary method?)
         this.platformTimer = this.time.addEvent ({
-            delay: 2000,
+            delay: 3100-100*this.scroll,
             callback: this.makePlatform,
             callbackScope: this,
             loop: true
@@ -49,7 +50,7 @@ class Play extends Phaser.Scene {
 		
 		this.player.body.bounce.x = 0.0;
         this.player.body.bounce.y = 0.0;
-        this.player.body.collideWorldBounds = true; //currently prevents player from falling through world bottom, remedy
+        this.player.body.collideWorldBounds = true; 
 
 		// add collisions
         this.physics.add.collider(this.player, this.platforms, this.playerHitPlatform, null, this);
@@ -153,7 +154,7 @@ class Play extends Phaser.Scene {
         platform.setScale(1);
         platform.body.allowGravity = false;
         platform.body.immovable = true;
-        platform.body.velocity.y = -100;
+        platform.body.velocity.y = this.platMod*this.scroll;
         platform.setFrictionX(1);
 
     }
