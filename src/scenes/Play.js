@@ -193,8 +193,11 @@ class Play extends Phaser.Scene {
         console.log(this.score);
         if(this.scroll<2&&this.score%20==0&&this.score>0){
             this.scroll+= .2;
-            this.platformTimer.timeScale = 1+.1*this.scroll;
+            this.platformTimer.timeScale = 1+.2*this.scroll;
             //update speed of existing platforms
+            this.platforms.getChildren().forEach(function (platform) {//code provided by Ben Rosien in the discord channel
+                platform.body.velocity.y = this.scroll*this.platMod;
+            }, this);
             /*Ooze Velocity Y = 0*/console.log('ooze Stop');
         } else if (this.score%20==10/*&&OozeVariable<maxOozeHeight*/)/*Ooze Velocity Y = 1*/console.log('ooze Creep');
         }
