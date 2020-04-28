@@ -9,6 +9,7 @@ class Play extends Phaser.Scene {
 		this.load.image("player", "assets/char.png");
         this.load.image("platform", "assets/rampsmall.png");
         this.load.image("backDrop", "assets/ware.png");
+        this.load.image("void", "/assets/void.png");
     }
 
     create(){
@@ -19,6 +20,8 @@ class Play extends Phaser.Scene {
         this.scroll = 1;
         this.platMod = -60;   
         this.score = 0;   
+
+        
         
         this.speedTimer = this.time.addEvent ({
             delay: 1000,
@@ -67,6 +70,9 @@ class Play extends Phaser.Scene {
         this.gameoverTop = false;
         this.gameoverBot = false;
 
+        // OOZE or VOID creation
+        this.void = new Ooze(this, 0, 1, 'void', 0).setOrigin(0, 1);
+
         let menuConfig = {
             fontFamily: 'Helvetica',
             fontSize: '30px',
@@ -84,17 +90,19 @@ class Play extends Phaser.Scene {
         let centerY = game.config.height/2;
         let textSpacer = 80;
 
+
         this.scoreBoard = this.add.text (0, 0, this.score, menuConfig);
 
         // assign keys
         keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-		
+        
+
     }
 
     update() {
-
+        
         // if player hasn't died yet
         if (!this.gameoverTop && !this.gameoverBot) {
  
@@ -118,9 +126,9 @@ class Play extends Phaser.Scene {
                 this.player.toggleFlipX();
                 this.player.isTurn = false;
             }
-            
+
             // check if player died
-            if (this.player.y < -50) { //to be changed to collision with ooze //(this.player.body.overlapY>0)
+            if (this.player.y < this.void.y) { //changed to fit void.y(NEW) //(this.player.body.overlapY>0)
                 console.log("game over, eaten by void");
                 this.gameoverTop=true;
                 //if(Oozeheight<game.config.height+50) this.Oozeheight ++;
@@ -128,6 +136,8 @@ class Play extends Phaser.Scene {
                 console.log("game over, fell of screen");
                 this.gameoverBot=true;
             }
+            // draw black ooze
+            this.void.update();
 
             this.scoreBoard.setText(this.score);
     
@@ -146,6 +156,9 @@ class Play extends Phaser.Scene {
             // stop platforms
             this.platformTimer.paused = true;
 
+            // stop ooze/void
+            //game.settings.oozeSpeed = 0;
+
             this.platforms.children.each(function(platform) {
                 platform.body.velocity.y = 0;
             }, this);
@@ -158,6 +171,7 @@ class Play extends Phaser.Scene {
                 this.scene.start("menuScene");
             }
         }
+        
 
     }
 
@@ -202,6 +216,7 @@ class Play extends Phaser.Scene {
         } else if (this.score%20==10/*&&OozeVariable<maxOozeHeight*/)/*Ooze Velocity Y = 1*/console.log('ooze Creep');
         }
     }
+
 
 
 }
