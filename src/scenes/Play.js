@@ -26,7 +26,7 @@ class Play extends Phaser.Scene {
         
         this.speedTimer = this.time.addEvent ({
             delay: 1000,
-            callback: this.scoreUP/*(this.score, this.speed)*/,
+            callback: this.scoreUp/*(this.score, this.speed)*/,
             callbackScope: this,
             loop: true
         });
@@ -209,22 +209,34 @@ class Play extends Phaser.Scene {
 
     }
 
-    scoreUP() {
-        if(!this.gameOverBot&&!this.gameOverTop){
-        this.score++;
-        console.log(this.score);
-        if(this.scroll<2&&this.score%20==0&&this.score>0){
-            this.scroll+= .2;
-            this.platformTimer.timeScale = 1+.2*this.scroll;
-            //update speed of existing platforms
-            this.platforms.getChildren().forEach(function (platform) {//code provided by Ben Rosien in the discord channel
-                platform.body.velocity.y = this.scroll*this.platMod;
-            }, this);
-            game.settings.oozeSpeed = 0;
-        } else if (this.score%20==10&&this.void.y<game.config.height/4)game.settings.oozeSpeed = .05;
+    scoreUp() {
+        
+        if (!this.gameOverBot && !this.gameOverTop) {
+        
+            this.score++;
+            console.log(this.score);
+        
+            if ((this.scroll < 2) && (this.score%20 == 0) && (this.score > 0)) {
+                
+                this.scroll += 0.2;
+                this.platformTimer.timeScale = 1 + (0.2*this.scroll);
+                
+                //update speed of existing platforms
+                //code provided by Ben Rosien in the discord channel
+                this.platforms.getChildren().forEach(function (platform) {
+                    platform.body.velocity.y = this.scroll*this.platMod;
+                }, this);
+
+                game.settings.oozeSpeed = 0;
+
+            } else if ((this.score%20 == 10) && (this.void.y < (game.config.height/4))) {
+        
+                game.settings.oozeSpeed = .05;
+        
+            }
+    
         }
+    
     }
-
-
 
 }
