@@ -131,13 +131,12 @@ class Play extends Phaser.Scene {
             if (this.player.y < this.void.y) { //changed to fit void.y(NEW) //(this.player.body.overlapY>0)
                 console.log("game over, eaten by void");
                 this.gameoverTop=true;
-                //if(Oozeheight<game.config.height+50) this.Oozeheight ++;
+                if(this.void.y<game.config.height+50) game.settings.oozeSpeed = 10; //flag
             } else if (this.player.y > game.config.height+50) {
                 console.log("game over, fell of screen");
                 this.gameoverBot=true;
             }
             // draw black ooze
-            this.void.update();
 
             this.scoreBoard.setText(this.score);
     
@@ -166,12 +165,16 @@ class Play extends Phaser.Scene {
             // reset scene
             if (Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
                 this.scene.restart();
+                game.settings.oozeSpeed = 0;
             }
             if (Phaser.Input.Keyboard.JustDown(keyLEFT)) {
                 this.scene.start("menuScene");
+                game.settings.oozeSpeed = 0;
             }
-        }
-        
+        } 
+
+        //moves void, but not past screen
+        if(this.void.y < game.config.height&&!this.gameoverBot)this.void.update();
 
     }
 
@@ -212,8 +215,8 @@ class Play extends Phaser.Scene {
             this.platforms.getChildren().forEach(function (platform) {//code provided by Ben Rosien in the discord channel
                 platform.body.velocity.y = this.scroll*this.platMod;
             }, this);
-            /*Ooze Velocity Y = 0*/console.log('ooze Stop');
-        } else if (this.score%20==10/*&&OozeVariable<maxOozeHeight*/)/*Ooze Velocity Y = 1*/console.log('ooze Creep');
+            game.settings.oozeSpeed = 0;
+        } else if (this.score%20==10&&this.void.y<game.config.height/4)game.settings.oozeSpeed = .05;
         }
     }
 
