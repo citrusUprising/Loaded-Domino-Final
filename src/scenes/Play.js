@@ -9,7 +9,7 @@ class Play extends Phaser.Scene {
 		this.load.image("player", "assets/char.png");
         this.load.image("platform", "assets/rampsmall.png");
         this.load.image("backDrop", "assets/ware.png");
-        this.load.image("void", "/assets/void.png");
+        this.load.image("void", "assets/void.png");
     }
 
     create(){
