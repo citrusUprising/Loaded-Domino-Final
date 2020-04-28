@@ -16,6 +16,7 @@ class Play extends Phaser.Scene {
 
         // create warehouse backdrop
         this.background = this.add.tileSprite(0, 0, 960, 540, "backDrop").setOrigin(0,0);
+        this.background.setDepth(-999);
         //speed of scrolling
         this.scroll = 1;
         this.platMod = -60;   
@@ -102,6 +103,10 @@ class Play extends Phaser.Scene {
     }
 
     update() {
+
+        this.platforms.children.each(function(platform) {
+            platform.setDepth(-998);
+        }, this);
         
         // if player hasn't died yet
         if (!this.gameoverTop && !this.gameoverBot) {
