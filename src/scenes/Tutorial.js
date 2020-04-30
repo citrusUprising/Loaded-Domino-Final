@@ -3,7 +3,7 @@ class Tutorial extends Phaser.Scene {
     constructor() {
         super("tutorialScene");
     }
-      
+
     preload() {
 
     }
@@ -76,6 +76,8 @@ class Tutorial extends Phaser.Scene {
             }
             //right starts game
             if(Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
+                game.settings.bgm.stop();
+                game.settings.tutorOpen = false;
                 this.scene.start("playScene");
             }
 

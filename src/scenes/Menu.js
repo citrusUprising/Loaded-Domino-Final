@@ -8,13 +8,26 @@ class Menu extends Phaser.Scene {
         // load title screen images
         this.load.image('title', './assets/tempTitle.png');
         this.load.image('back', './assets/back.png');
+        this.load.audio('menuMusic', './assets/OnMyWay.mp3');
+        this.load.audio('gameMusic', './assets/TheShowMustBeGo.mp3');
     }
     
     create() {
-        
+
         // add title backdrop
         this.backdrop = this.add.tileSprite(0, 0, 960, 540, "back").setOrigin(0,0);
 
+        let musicConfig = {
+            mute: false,
+            volume: .4,
+            loop: true
+        }
+
+        
+        if(!game.settings.tutorOpen){
+           game.settings.bgm = this.sound.add('menuMusic', musicConfig);
+           game.settings.bgm.play();
+        }
        /* let titleConfig = {
             fontFamily: 'Helvetica',
             fontSize: '60px',
@@ -78,11 +91,14 @@ class Menu extends Phaser.Scene {
         if (Phaser.Input.Keyboard.JustDown(keyLEFT)) {
             // go to tutorial
             //this.sound.play('name');
+            game.settings.tutorOpen = true;
             this.scene.start("tutorialScene");
         }
         if (Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
             //go to game
             //this.sound.play('name');
+            game.settings.bgm.stop();
+            game.settings.tutorOpen = false;
             this.scene.start("playScene");
         }
 

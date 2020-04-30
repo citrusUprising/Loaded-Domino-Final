@@ -25,10 +25,10 @@ class Player extends Phaser.GameObjects.Sprite {
         // speed up in direction if holding left or right
         if (keyLEFT.isDown && !keyRIGHT.isDown) {
             //this.body.acceleration.x = -this.speedUp;
-            this.body.velocity.x = -this.speed;
+            this.body.velocity.x = -this.speed; //flag audio?
         } else if (keyRIGHT.isDown && !keyLEFT.isDown) {
             //this.body.acceleration.x = this.speedUp;
-            this.body.velocity.x = this.speed;
+            this.body.velocity.x = this.speed; //flag audio?
         }
 
         /*
@@ -68,7 +68,7 @@ class Player extends Phaser.GameObjects.Sprite {
         }
 
         // jump!
-        if (!this.isJump && Phaser.Input.Keyboard.JustDown(keySPACE)) {
+        if (!this.isJump && Phaser.Input.Keyboard.JustDown(keySPACE)) {//flag audio
             this.body.velocity.y = this.jumpHeight;
             this.isJump = true;
         }

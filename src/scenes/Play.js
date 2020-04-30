@@ -17,6 +17,21 @@ class Play extends Phaser.Scene {
         // create warehouse backdrop
         this.background = this.add.tileSprite(0, 0, 960, 540, "backDrop").setOrigin(0,0);
         this.background.setDepth(-999);
+        
+        //sets up music
+
+        let musicPlayConfig = {
+            mute: false,
+            volume: .6,
+            loop: true
+        }
+
+         if(!game.settings.playing){
+            this.bgm = this.sound.add('gameMusic',musicPlayConfig);
+            this.bgm.play();
+        }
+        game.settings.playing = true;
+        
         //speed of scrolling
         this.scroll = 1;
         this.platMod = -60;   
@@ -133,10 +148,10 @@ class Play extends Phaser.Scene {
             }
 
             // check if player died
-            if (this.player.y < this.void.y) { //changed to fit void.y(NEW) //(this.player.body.overlapY>0)
+            if (this.player.y < this.void.y) {
                 console.log("game over, eaten by void");
                 this.gameoverTop=true;
-                if(this.void.y<game.config.height+50) game.settings.oozeSpeed = 10; //flag
+                if(this.void.y<game.config.height+50) game.settings.oozeSpeed = 10; 
             } else if (this.player.y > game.config.height+50) {
                 console.log("game over, fell of screen");
                 this.gameoverBot=true;
@@ -169,12 +184,14 @@ class Play extends Phaser.Scene {
 
             // reset scene
             if (Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
-                this.scene.restart();
                 game.settings.oozeSpeed = 0;
+                this.scene.restart();           
             }
             if (Phaser.Input.Keyboard.JustDown(keyLEFT)) {
-                this.scene.start("menuScene");
+                game.settings.playing = false;
+                this.bgm.stop();
                 game.settings.oozeSpeed = 0;
+                this.scene.start("menuScene");
             }
         } 
 

@@ -26,7 +26,10 @@ let game = new Phaser.Game(config);
 
 game.settings = {
 	// ooze settings
-	oozeSpeed: 0, //flag
+	oozeSpeed: 0,
+	tutorOpen: false,
+	playing: false,
+	bgm: null,
 }
 
 // define key constants
