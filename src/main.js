@@ -33,4 +33,4 @@ game.settings = {
 }
 
 // define key constants
-let keyLEFT, keyRIGHT, keySPACE;
+let keyLEFT, keyRIGHT, keySPACE, keyUP, keyDOWN;

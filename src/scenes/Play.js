@@ -113,7 +113,8 @@ class Play extends Phaser.Scene {
         keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
-        
+        keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+        keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
 
     }
 
@@ -183,11 +184,11 @@ class Play extends Phaser.Scene {
             }, this);
 
             // reset scene
-            if (Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
+            if (Phaser.Input.Keyboard.JustDown(keyUP)) {
                 game.settings.oozeSpeed = 0;
                 this.scene.restart();           
             }
-            if (Phaser.Input.Keyboard.JustDown(keyLEFT)) {
+            if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
                 game.settings.playing = false;
                 this.bgm.stop();
                 game.settings.oozeSpeed = 0;
