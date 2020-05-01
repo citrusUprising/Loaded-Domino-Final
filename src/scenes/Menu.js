@@ -5,11 +5,18 @@ class Menu extends Phaser.Scene {
     }
     
     preload() {
+
         // load title screen images
         this.load.image('title', './assets/tempTitle.png');
         this.load.image('back', './assets/back.png');
+
+        // load music
         this.load.audio('menuMusic', './assets/OnMyWay.mp3');
         this.load.audio('gameMusic', './assets/TheShowMustBeGo.mp3');
+
+        // load sfx
+		/*this.load.audio("sfx_jump", "assets/sfx/jump.mp3");*/
+
     }
     
     create() {

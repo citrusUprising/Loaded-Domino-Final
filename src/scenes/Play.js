@@ -151,10 +151,12 @@ class Play extends Phaser.Scene {
             // check if player died
             if (this.player.y < this.void.y) {
                 console.log("game over, eaten by void");
+                this.finScore=this.score;
                 this.gameoverTop=true;
                 if(this.void.y<game.config.height+50) game.settings.oozeSpeed = 10; 
             } else if (this.player.y > game.config.height+50) {
                 console.log("game over, fell of screen");
+                this.finScore=this.score;
                 this.gameoverBot=true;
             }
             // draw black ooze
@@ -165,6 +167,30 @@ class Play extends Phaser.Scene {
         } else {
 
             // game over!
+            //this.menuConfig.fixedWidth = 0; //flag
+
+            let GOConfig = {
+                fontFamily: 'Helvetica',
+                fontSize: '30px',
+                color: '#facade',
+                align: 'center',
+                padding: {
+                    top: 10,
+                    bottom: 10,
+                },
+                fixedWidth: 0
+            }
+
+            this.scoreBoard.setVisible(false);
+
+            //Game Over stats
+            this.add.rectangle(game.config.width/2, game.config.height/2, 500, 360, 0x000000).setOrigin(.5);
+            this.add.text (game.config.width/2, game.config.height/2-2*60, 'Game Over', GOConfig).setOrigin(0.5);
+            if(this.gameoverTop)this.add.text (game.config.width/2, game.config.height/2-60, 'You succumbed to anxiety', GOConfig).setOrigin(0.5);
+            else if (this.gameoverBot)this.add.text (game.config.width/2, game.config.height/2-60, 'You fell to your death', GOConfig).setOrigin(0.5);
+            this.add.text (game.config.width/2, game.config.height/2, 'You worked for a total of '+this.finScore+' seconds', GOConfig).setOrigin(0.5);
+            this.add.text (game.config.width/2, game.config.height/2+60, 'Press (UP) to try again', GOConfig).setOrigin(0.5);
+            this.add.text (game.config.width/2, game.config.height/2+120, 'Press (DOWN) to return to menu', GOConfig).setOrigin(0.5);
 
             // turn off player movement
             this.player.body.velocity.x = 0;
