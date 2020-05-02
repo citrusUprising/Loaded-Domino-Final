@@ -36,7 +36,7 @@ class Tutorial extends Phaser.Scene {
         
         this.add.text (
             centerX, centerY-textSpacer, 
-            'Descend the shelves using (Left) and (Right) to move', menuConfig
+            'Descend the shelves using ← and → to move', menuConfig
         ).setOrigin(0.5);
 
         this.add.text (
@@ -54,9 +54,11 @@ class Tutorial extends Phaser.Scene {
             'or be consumed by your own existential dread.', menuConfig
         ).setOrigin(0.5);
 
+        menuConfig.color = '#de7183';
+
         this.add.text (
             centerX, centerY+3*textSpacer, 
-            '(Left) Menu (Right) Start Shift', menuConfig
+            '← Menu   → Start Shift', menuConfig
         ).setOrigin(0.5);
 
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);

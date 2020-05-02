@@ -56,7 +56,7 @@ class Menu extends Phaser.Scene {
             fontFamily: 'Helvetica',
             fontSize: '30px',
             backgroundColor: '#000000',
-            color: '#facade',
+            color: '#de7183',
             align: 'center',
             padding: {
                 top: 10,
@@ -89,10 +89,16 @@ class Menu extends Phaser.Scene {
             centerX, centerY+textSpacer, 
             'Press → to start Game', menuConfig
         ).setOrigin(0.5); 
+
+        this.add.text (
+            centerX, centerY+2*textSpacer, 
+            'Press ↓ to view credits', menuConfig
+        ).setOrigin(0.5); 
         
         // titlescreen keyboard controls
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
     
     }
 
@@ -112,11 +118,17 @@ class Menu extends Phaser.Scene {
             this.scene.start("playScene");
         }
 
+        if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
+            // go to tutorial
+            //this.sound.play('name');
+            game.settings.tutorOpen = true;
+            this.scene.start("creditScene");
+        }
+
         // scroll backdrop and titlecard
         this.backdrop.tilePositionX -= 2;
         this.backdrop.tilePositionY -= 1;
         this.titleCard.tilePositionX += 3;
 
     }
-
 }

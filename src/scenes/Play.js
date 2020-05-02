@@ -61,6 +61,8 @@ class Play extends Phaser.Scene {
             loop: true
         }
 
+        musicPlayConfig.volume = .6;
+
          if (!game.settings.playing) {
             this.bgm = this.sound.add('gameMusic', musicPlayConfig);
             this.bgm.play();
@@ -188,14 +190,14 @@ class Play extends Phaser.Scene {
             // check if player died
             if (this.player.y < this.void.y) {
 
-                console.log("game over, eaten by void");
+                //console.log("game over, eaten by void");
                 this.finScore = this.score;
                 this.gameoverTop = true;
                 this.sound.play("sfxConsume", {volume: 0.25});
 
             } else if (this.player.y > game.config.height+50) {
 
-                console.log("game over, fell off screen");
+                //console.log("game over, fell off screen");
                 this.finScore = this.score;
                 this.gameoverBot = true;
                 this.sound.play("sfxFall", {volume: 0.25});
@@ -207,13 +209,15 @@ class Play extends Phaser.Scene {
         // else, if player's dead
         } else {
 
+            this.bgm.volume =.2;
+
             // game over!
             //this.menuConfig.fixedWidth = 0; //flag
 
             let GOConfig = {
                 fontFamily: 'Helvetica',
-                fontSize: '30px',
-                color: '#facade',
+                fontSize: '50px',
+                color: '#e81e40',
                 align: 'center',
                 padding: {
                     top: 10,
@@ -221,17 +225,21 @@ class Play extends Phaser.Scene {
                 },
                 fixedWidth: 0
             }
+            let textSpacer = 60;
 
             this.scoreBoard.setVisible(false);
 
             //Game Over stats
             this.add.rectangle(game.config.width/2, game.config.height/2, 500, 360, 0x000000).setOrigin(.5);
-            this.add.text (game.config.width/2, game.config.height/2-2*60, 'Game Over', GOConfig).setOrigin(0.5);
-            if(this.gameoverTop)this.add.text (game.config.width/2, game.config.height/2-60, 'You succumbed to anxiety', GOConfig).setOrigin(0.5);
-            else if (this.gameoverBot)this.add.text (game.config.width/2, game.config.height/2-60, 'You fell to your death', GOConfig).setOrigin(0.5);
+            this.add.text (game.config.width/2, game.config.height/2-2*textSpacer, 'Game Over', GOConfig).setOrigin(0.5);
+            GOConfig.fontSize = '30px';
+            GOConfig.color = '#facade';
+            if(this.gameoverTop)this.add.text (game.config.width/2, game.config.height/2-textSpacer, 'You succumbed to anxiety', GOConfig).setOrigin(0.5);
+            else if (this.gameoverBot)this.add.text (game.config.width/2, game.config.height/2-textSpacer, 'You fell to your death', GOConfig).setOrigin(0.5);
             this.add.text (game.config.width/2, game.config.height/2, 'You worked for a total of '+this.finScore+' seconds', GOConfig).setOrigin(0.5);
-            this.add.text (game.config.width/2, game.config.height/2+60, 'Press (UP) to try again', GOConfig).setOrigin(0.5);
-            this.add.text (game.config.width/2, game.config.height/2+120, 'Press (DOWN) to return to menu', GOConfig).setOrigin(0.5);
+            GOConfig.color = '#de7183';
+            this.add.text (game.config.width/2, game.config.height/2+textSpacer, 'Press ↑ to try again', GOConfig).setOrigin(0.5);
+            this.add.text (game.config.width/2, game.config.height/2+2*textSpacer, 'Press ↓ to return to menu', GOConfig).setOrigin(0.5);
 
             if (this.gameoverTop)game.settings.oozeSpeed = 10;
 
@@ -255,6 +263,7 @@ class Play extends Phaser.Scene {
             // reset scene
             if (Phaser.Input.Keyboard.JustDown(keyUP)) {
                 game.settings.oozeSpeed = 0;
+                this.bgm.volume =.6;
                 this.scene.restart();           
             }
             if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
