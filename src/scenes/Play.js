@@ -28,7 +28,7 @@ class Play extends Phaser.Scene {
             key: 'voider',
             repeat: -1,
             frames: this.anims.generateFrameNumbers('void1', { start: 0, end: 6, first: 0}),
-            frameRate: 12
+            frameRate: 8
         });
         
 		// create animations
