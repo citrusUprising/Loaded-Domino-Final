@@ -28,7 +28,7 @@ class Play extends Phaser.Scene {
             key: 'voider',
             repeat: -1,
             frames: this.anims.generateFrameNumbers('void1', { start: 0, end: 6, first: 0}),
-            frameRate: 30
+            frameRate: 12
         });
         
 		// create animations
@@ -188,9 +188,6 @@ class Play extends Phaser.Scene {
                 this.finScore = this.score;
                 this.gameoverTop = true;
                 this.sound.play("sfxConsume", {volume: 0.25});
-                if (this.void.y < game.config.height+100) {
-                    game.settings.oozeSpeed = 10;
-                }
 
             } else if (this.player.y > game.config.height+50) {
 
@@ -232,6 +229,8 @@ class Play extends Phaser.Scene {
             this.add.text (game.config.width/2, game.config.height/2+60, 'Press (UP) to try again', GOConfig).setOrigin(0.5);
             this.add.text (game.config.width/2, game.config.height/2+120, 'Press (DOWN) to return to menu', GOConfig).setOrigin(0.5);
 
+            if (this.gameoverTop)game.settings.oozeSpeed = 10;
+
             // turn off player movement
             this.player.body.velocity.x = 0;
 		    this.player.body.velocity.y = 0;
@@ -263,7 +262,8 @@ class Play extends Phaser.Scene {
         } 
 
         //moves void, but not past screen
-        if(this.void.y < game.config.height&&!this.gameoverBot)this.void.update();
+        if(this.void.y < game.config.height+100&&!this.gameoverBot)this.void.update();
+        else  game.settings.oozeSpeed = 0;
 
     }
 
