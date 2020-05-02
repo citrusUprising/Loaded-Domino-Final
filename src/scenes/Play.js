@@ -14,7 +14,8 @@ class Play extends Phaser.Scene {
 
         // load sprite atlas
         this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
-
+        this.load.spritesheet("void1", "assets/void1.png", {frameWidth: 960, frameHeight :1050, startFrame: 0,
+            endFrame: 6});
     }
 
     create(){
@@ -22,6 +23,13 @@ class Play extends Phaser.Scene {
         // create warehouse backdrop
         this.background = this.add.tileSprite(0, 0, 960, 540, "backDrop").setOrigin(0,0);
         this.background.setDepth(-999);
+
+        this.anims.create({
+            key: 'voider',
+            repeat: -1,
+            frames: this.anims.generateFrameNumbers('void1', { start: 0, end: 6, first: 0}),
+            frameRate: 30
+        });
         
 		// create animations
 		this.anims.create({
@@ -180,7 +188,7 @@ class Play extends Phaser.Scene {
                 this.finScore = this.score;
                 this.gameoverTop = true;
                 this.sound.play("sfxConsume", {volume: 0.25});
-                if (this.void.y < game.config.height+50) {
+                if (this.void.y < game.config.height+100) {
                     game.settings.oozeSpeed = 10;
                 }
 
