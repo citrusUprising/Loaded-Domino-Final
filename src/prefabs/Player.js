@@ -6,6 +6,9 @@ class Player extends Phaser.GameObjects.Sprite {
 
         scene.add.existing(this);
 
+        // save scene in var so we can reference it
+        this.scene = scene;
+
         this.speed = 300;
         this.jumpHeight = -400;
 
@@ -40,6 +43,13 @@ class Player extends Phaser.GameObjects.Sprite {
         }
         */
 
+        if (keyLEFT.isDown || keyRIGHT.isDown) {
+            this.anims.play("playerRun", true);
+        } else {
+            this.anims.play("playerIdle");
+        }
+
+
         if (this.isRight && keyLEFT.isDown && !keyRIGHT.isDown) {
             this.isTurn = true;
             this.isRight = false;
@@ -68,9 +78,10 @@ class Player extends Phaser.GameObjects.Sprite {
         }
 
         // jump!
-        if (!this.isJump && Phaser.Input.Keyboard.JustDown(keySPACE)) {//flag audio
+        if (!this.isJump && Phaser.Input.Keyboard.JustDown(keySPACE)) {
             this.body.velocity.y = this.jumpHeight;
             this.isJump = true;
+            this.scene.sound.play("sfxJump", {volume: 0.25});
         }
         
     }

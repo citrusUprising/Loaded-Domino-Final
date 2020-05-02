@@ -5,11 +5,16 @@ class Play extends Phaser.Scene {
     }
     
     preload() {
+
 		// load temp images
-		this.load.image("player", "assets/char.png");
-        this.load.image("platform", "assets/rampsmall.png");
+		//this.load.image("player", "assets/char.png");
+        //this.load.image("platform", "assets/rampsmall.png");
         this.load.image("backDrop", "assets/ware.png");
         this.load.image("void", "assets/void.png");
+
+        // load sprite atlas
+        this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
+
     }
 
     create(){
@@ -18,16 +23,38 @@ class Play extends Phaser.Scene {
         this.background = this.add.tileSprite(0, 0, 960, 540, "backDrop").setOrigin(0,0);
         this.background.setDepth(-999);
         
-        //sets up music
+		// create animations
+		this.anims.create({
+			key: "playerRun",
+			frames: this.anims.generateFrameNames("sprites", {
+				prefix: "run",
+				start: 1,
+				end: 24,
+                zeroPad: 0
+			}),
+            frameRate: 60,
+            repeat: -1
+        });
 
+        this.anims.create({
+			key: "playerIdle",
+			frames: this.anims.generateFrameNames("sprites", {
+				prefix: "run",
+				start: 1,
+				end: 1,
+                zeroPad: 0
+			}),
+		});
+
+        //sets up music
         let musicPlayConfig = {
             mute: false,
             volume: .6,
             loop: true
         }
 
-         if(!game.settings.playing){
-            this.bgm = this.sound.add('gameMusic',musicPlayConfig);
+         if (!game.settings.playing) {
+            this.bgm = this.sound.add('gameMusic', musicPlayConfig);
             this.bgm.play();
         }
         game.settings.playing = true;
@@ -36,8 +63,6 @@ class Play extends Phaser.Scene {
         this.scroll = 1;
         this.platMod = -60;   
         this.score = 0;   
-
-        
         
         this.speedTimer = this.time.addEvent ({
             delay: 1000,
@@ -50,7 +75,7 @@ class Play extends Phaser.Scene {
         this.platforms = this.physics.add.group(); //shift to platform class??
         
         // starting platform
-		this.platforms.create(game.config.width/2, game.config.height+50, "platform").setScale(1);
+		this.platforms.create(game.config.width/2, game.config.height+50, "sprites", "rampsmall").setScale(1);
 		
 		// iterate through platforms group, set variables
 		this.platforms.children.each(function(platform) {
@@ -72,7 +97,7 @@ class Play extends Phaser.Scene {
         this.physics.world.setBounds(0, -100, game.config.width, game.config.height+200);
 
 		// add player with physics
-		this.player = new Player(this, game.config.width/2, 150, "player", 0);
+		this.player = new Player(this, game.config.width/2, 150, "sprites", "run1");
 		this.physics.add.existing(this.player);
 		
 		this.player.body.bounce.x = 0.0;
@@ -150,16 +175,23 @@ class Play extends Phaser.Scene {
 
             // check if player died
             if (this.player.y < this.void.y) {
+
                 console.log("game over, eaten by void");
-                this.finScore=this.score;
-                this.gameoverTop=true;
-                if(this.void.y<game.config.height+50) game.settings.oozeSpeed = 10; 
+                this.finScore = this.score;
+                this.gameoverTop = true;
+                this.sound.play("sfxConsume", {volume: 0.25});
+                if (this.void.y < game.config.height+50) {
+                    game.settings.oozeSpeed = 10;
+                }
+
             } else if (this.player.y > game.config.height+50) {
-                console.log("game over, fell of screen");
-                this.finScore=this.score;
-                this.gameoverBot=true;
+
+                console.log("game over, fell off screen");
+                this.finScore = this.score;
+                this.gameoverBot = true;
+                this.sound.play("sfxFall", {volume: 0.25});
+
             }
-            // draw black ooze
 
             this.scoreBoard.setText(this.score);
     
@@ -243,7 +275,7 @@ class Play extends Phaser.Scene {
         let sx = Phaser.Math.RND.between(-25, game.config.width+25);
         //console.log(sx);
 
-        let platform = this.platforms.create(sx, game.config.height+50, "platform");
+        let platform = this.platforms.create(sx, game.config.height+50, "sprites", "rampsmall");
 
         platform.setScale(1);
         platform.body.allowGravity = false;
@@ -258,7 +290,6 @@ class Play extends Phaser.Scene {
         if (!this.gameOverBot && !this.gameOverTop) {
         
             this.score++;
-            console.log(this.score);
         
             if ((this.scroll < 2) && (this.score%20 == 0) && (this.score > 0)) {
                 
@@ -275,7 +306,7 @@ class Play extends Phaser.Scene {
 
             } else if ((this.score%20 == 10) && (this.void.y < (game.config.height/4))) {
         
-                game.settings.oozeSpeed = .05;
+                game.settings.oozeSpeed = 0.05;
         
             }
     

@@ -15,7 +15,10 @@ class Menu extends Phaser.Scene {
         this.load.audio('gameMusic', './assets/TheShowMustBeGo.mp3');
 
         // load sfx
-		/*this.load.audio("sfx_jump", "assets/sfx/jump.mp3");*/
+		this.load.audio("sfxJump", ["assets/sfx/jump.mp3", "assets/sfx/jump.ogg"]);
+		this.load.audio("sfxFall", ["assets/sfx/fall.mp3", "assets/sfx/fall.ogg"]);
+		this.load.audio("sfxPlatform", ["assets/sfx/platform.mp3", "assets/sfx/platform.ogg"]);
+		this.load.audio("sfxConsume", ["assets/sfx/consume.mp3", "assets/sfx/consume.ogg"]);
 
     }
     
