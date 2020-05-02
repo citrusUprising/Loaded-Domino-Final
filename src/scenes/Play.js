@@ -71,6 +71,10 @@ class Play extends Phaser.Scene {
         this.scroll = 1;
         this.platMod = -60;   
         this.score = 0;   
+
+        //platform generation
+        this.xL = 0;
+        this.xR = game.config.width;
         
         this.speedTimer = this.time.addEvent ({
             delay: 1000,
@@ -120,7 +124,7 @@ class Play extends Phaser.Scene {
         this.gameoverBot = false;
 
         // OOZE or VOID creation
-        this.void = new Ooze(this, 0, 1, 'void', 0).setOrigin(0, 1);
+        this.void = new Ooze(this, 0, 0, 'void', 0).setOrigin(0, 1);
 
         let menuConfig = {
             fontFamily: 'Helvetica',
@@ -280,7 +284,11 @@ class Play extends Phaser.Scene {
     // spawn platform randomly at bottom of screen
     makePlatform() {
 
-        let sx = Phaser.Math.RND.between(-25, game.config.width+25);
+        let sx = Phaser.Math.RND.between(this.xL, this.xR);
+        this.xL = sx-(game.config.width*2/3);
+        if (this.xL < -25)this.xL = -25;
+        this.xR = sx+(game.config.width*2/3);
+        if (this.xR > game.config.width+25)this.xR = game.config.width+25;
         //console.log(sx);
 
         let platform = this.platforms.create(sx, game.config.height+50, "sprites", "rampsmall");
