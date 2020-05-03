@@ -15,7 +15,7 @@ class Play extends Phaser.Scene {
         // load sprite atlas
         this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
         this.load.spritesheet("void1", "assets/void1.png", {frameWidth: 960, frameHeight :1050, startFrame: 0,
-            endFrame: 6});
+            endFrame: 29});
     }
 
     create(){
@@ -27,8 +27,8 @@ class Play extends Phaser.Scene {
         this.anims.create({
             key: 'voider',
             repeat: -1,
-            frames: this.anims.generateFrameNumbers('void1', { start: 0, end: 6, first: 0}),
-            frameRate: 8
+            frames: this.anims.generateFrameNumbers('void1', { start: 0, end: 29, first: 0}),
+            frameRate: 25
         });
         
 		// create animations
