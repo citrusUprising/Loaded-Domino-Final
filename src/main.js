@@ -1,5 +1,5 @@
 /*
- * WIP Name: Shelving Crisis
+ * Warehouse Panic (2020)
  * 
  * Single player infinite-dropper
  * by Camellia Shea, Sean Noelle, and Josepheng Xiong
