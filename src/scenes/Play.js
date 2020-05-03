@@ -54,14 +54,9 @@ class Play extends Phaser.Scene {
 			}),
         });
         
-        this.anims.create({//flag
+        this.anims.create({
 			key: "playerAir",
-			frames: this.anims.generateFrameNames("sprites", {
-				prefix: "run",
-				start: 1,
-				end: 1,
-                zeroPad: 0
-			}),
+			frames: [{ key: "sprites", frame: "jump" }]
 		});
 
         //sets up music
@@ -73,7 +68,7 @@ class Play extends Phaser.Scene {
 
         musicPlayConfig.volume = .6;
 
-         if (!game.settings.playing) {
+        if (!game.settings.playing) {
             this.bgm = this.sound.add('gameMusic', musicPlayConfig);
             this.bgm.play();
         }

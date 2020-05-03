@@ -92,7 +92,7 @@ class Menu extends Phaser.Scene {
 
         this.add.text (
             centerX, centerY+2*textSpacer, 
-            'Press ↓ to view credits', menuConfig
+            'Press ↓ to view Credits', menuConfig
         ).setOrigin(0.5); 
         
         // titlescreen keyboard controls

@@ -44,7 +44,7 @@ class Player extends Phaser.GameObjects.Sprite {
         */
 
         if (this.isJump) {
-            this.anims.play("playerAir", true); //flag
+            this.anims.play("playerAir", true);
         } else if(keyLEFT.isDown || keyRIGHT.isDown){
             this.anims.play("playerRun", true);
         }else{
