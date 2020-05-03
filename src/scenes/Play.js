@@ -52,6 +52,16 @@ class Play extends Phaser.Scene {
 				end: 1,
                 zeroPad: 0
 			}),
+        });
+        
+        this.anims.create({//flag
+			key: "playerAir",
+			frames: this.anims.generateFrameNames("sprites", {
+				prefix: "run",
+				start: 1,
+				end: 1,
+                zeroPad: 0
+			}),
 		});
 
         //sets up music
