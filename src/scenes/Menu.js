@@ -7,8 +7,9 @@ class Menu extends Phaser.Scene {
     preload() {
 
         // load title screen images
-        this.load.image('title', './assets/tempTitle.png');
+        //this.load.image('title', './assets/tempTitle.png');
         this.load.image('back', './assets/back.png');
+        this.load.image('title', './assets/title.png');
 
         // load music
         this.load.audio('menuMusic', './assets/OnMyWay.mp3');
@@ -25,7 +26,7 @@ class Menu extends Phaser.Scene {
     create() {
 
         // add title backdrop
-        this.backdrop = this.add.tileSprite(0, 0, 960, 540, "back").setOrigin(0,0);
+        this.backdrop = this.add.tileSprite(0, 0, 960, 540, "title").setOrigin(0,0);
 
         let musicConfig = {
             mute: false,
@@ -71,10 +72,10 @@ class Menu extends Phaser.Scene {
         let textSpacer = 80;
 
         // add titlecard sprite
-        this.titleCard = this.add.tileSprite (
+        /*this.titleCard = this.add.tileSprite (
             game.config.width/2, game.config.height/2-2*textSpacer,
             470, 175, "title"
-        ).setOrigin(.5, .5);
+        ).setOrigin(.5, .5);*/
 
        /* this.add.text(centerX, centerY-2*textSpacer, 
             'SHELVING CRISIS', titleConfig).setOrigin(0.5);*/
@@ -126,9 +127,9 @@ class Menu extends Phaser.Scene {
         }
 
         // scroll backdrop and titlecard
-        this.backdrop.tilePositionX -= 2;
+        /*this.backdrop.tilePositionX -= 2;
         this.backdrop.tilePositionY -= 1;
-        this.titleCard.tilePositionX += 3;
+        this.titleCard.tilePositionX += 3;*/
 
     }
 }
