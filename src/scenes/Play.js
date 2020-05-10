@@ -101,6 +101,9 @@ class Play extends Phaser.Scene {
 			platform.body.allowGravity = false;
             platform.body.immovable = true;
             platform.body.velocity.y = this.platMod*this.scroll;
+            platform.body.checkCollision.left = false;
+            platform.body.checkCollision.right = false;
+            platform.body.checkCollision.down = false;
             platform.setFrictionX(1);
 		}, this);
 
@@ -116,9 +119,12 @@ class Play extends Phaser.Scene {
         this.physics.world.setBounds(0, -100, game.config.width, game.config.height+200);
 
 		// add player with physics
-		this.player = new Player(this, game.config.width/2, 150, "sprites", "run1");
-		this.physics.add.existing(this.player);
-		
+		this.player = new Player(this, game.config.width/2, 150, "sprites", "run1").setOrigin(0.5,0.5);
+        this.physics.add.existing(this.player);
+
+        // set player body size, 10 pixel gap on left + right
+        this.player.body.setSize(60, 60, 10, 0);
+
 		this.player.body.bounce.x = 0.0;
         this.player.body.bounce.y = 0.0;
         this.player.body.collideWorldBounds = true; 
@@ -311,6 +317,9 @@ class Play extends Phaser.Scene {
         platform.body.allowGravity = false;
         platform.body.immovable = true;
         platform.body.velocity.y = this.platMod*this.scroll;
+        platform.body.checkCollision.left = false;
+        platform.body.checkCollision.right = false;
+        platform.body.checkCollision.down = false;
         platform.setFrictionX(1);
 
     }
