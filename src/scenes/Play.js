@@ -98,6 +98,16 @@ class Play extends Phaser.Scene {
 
 		// group for platform collisions
         this.platforms = this.physics.add.group(); //shift to platform class??
+
+        //group for box collisions
+        this.boxes = this.physics.add.group();
+
+        //group for shelf collisions
+        this.shelves = this.physics.add.group();
+
+        //group for mess collisions
+
+        //group for customer collisions
         
         // starting platform
 		this.platforms.create(game.config.width/2, game.config.height+50, "sprites", "rampsmall").setScale(1);
@@ -111,7 +121,25 @@ class Play extends Phaser.Scene {
             platform.body.checkCollision.right = false;
             platform.body.checkCollision.down = false;
             platform.setFrictionX(1);
-		}, this);
+        }, this);
+        
+        // iterate through boxes group, set variables
+		this.boxes.children.each(function(box) {
+			box.body.allowGravity = false;
+            box.body.immovable = true;
+            box.body.velocity.y = this.platMod*this.scroll;
+            box.setFrictionX(1);
+        }, this);
+        
+        // iterate through shelves group, set variables
+		this.shelves.children.each(function(shelf) {
+			shelf.body.allowGravity = false;
+            shelf.body.immovable = true;
+            shelf.body.velocity.y = this.platMod*this.scroll;
+            shelf.setFrictionX(1);
+        }, this);
+        
+        //iterate throuhg full shelf, set variable
 
         // add timer for spawning platforms (possibly temporary method?)
         this.platformTimer = this.time.addEvent ({
@@ -137,6 +165,8 @@ class Play extends Phaser.Scene {
 
 		// add collisions
         this.physics.add.collider(this.player, this.platforms, this.playerHitPlatform, null, this);
+        this.physics.add.collider(this.player, this.boxes, this.playerGrabBox, null, this);
+        this.physics.add.collider(this.player, this.shelves, this.playerShelving, null, this);
 
         //separate gameover variables depending on death
         this.gameoverTop = false;
@@ -179,6 +209,14 @@ class Play extends Phaser.Scene {
         this.platforms.children.each(function(platform) {
             platform.setDepth(-998);
         }, this);
+
+        this.boxes.children.each(function(box) {
+            box.setDepth(-996);
+        }, this);
+
+        this.shelves.children.each(function(shelf) {
+            shelf.setDepth(-997);
+        }, this);
         
         // if player hasn't died yet
         if (!this.gameoverTop && !this.gameoverBot) {
@@ -194,6 +232,20 @@ class Play extends Phaser.Scene {
             this.platforms.children.each(function(platform) {
                 if (platform.y < -platform.height) {
                     platform.destroy();
+                }
+            }, this);
+
+            //destroy boxes and shelves
+            this.boxes.children.each(function(box) {
+                if (box.y < this.void.y-box.height) {
+                    box.destroy();
+                }
+            }, this);
+
+            this.shelves.children.each(function(shelf) {
+                if (shelf.y < this.void.y-shelf.height) {
+
+                    shelf.destroy();
                 }
             }, this);
 
@@ -277,6 +329,10 @@ class Play extends Phaser.Scene {
                 platform.body.velocity.y = 0;
             }, this);
 
+            //flag add boxes
+
+            //flag add shelves
+
             // reset scene
             if (Phaser.Input.Keyboard.JustDown(keyUP)) {
                 game.settings.oozeSpeed = 0;
@@ -307,6 +363,17 @@ class Play extends Phaser.Scene {
 
     }
 
+    playerGrabBox(player, box) {
+        if(!player.hasBox){
+            player.hasBox = true;
+            box.destroy();
+        }
+    }
+
+    playerShelving(player, shelf) {
+
+    }
+
     // spawn platform randomly at bottom of screen
     makePlatform() {
 
@@ -329,21 +396,14 @@ class Play extends Phaser.Scene {
         platform.setFrictionX(1);
 
         // 30% chance of spawning box / shelf
-        let boxShelfChance = 30;
+        let objectChance = 30;
 
         let spawnRoll = Phaser.Math.RND.between(0, 100);
 
-        // could modify this to spawn other stuff in the same code
-        if (spawnRoll <= boxShelfChance) {
-            if (this.madeBox) {
-                // shelf spawning code here
-                console.log("A wild SHELF appears!");
-                this.madeBox = false;
-            } else {
-                // shelf spawning code here
-                console.log("A wild BOX appears!");
-                this.madeBox = true;
-            }
+        // runs code to determine what object is spawned
+        if (spawnRoll <= objectChance) {
+            let xRandom = Phaser.Math.RND.between(sx-50, sx+50);
+            this.spawnObject(xRandom, game.config.height+50);
         }
     }
 
@@ -374,6 +434,60 @@ class Play extends Phaser.Scene {
     
         }
     
+    }
+    spawnObject(x, y){
+
+        //needs an order
+        let boxShelfChance = 1;
+        let messChance = 0;
+        let customerChance = 0;
+
+        let typeRoll = Phaser.Math.RND.between(1, 3);
+
+        if(boxShelfChance <= typeRoll){//change to == once other methods implemented
+            if (this.madeBox) {
+                // spawnBox(x, y);
+                console.log("A wild SHELF appears!");
+                this.madeBox = false;
+            } else {
+                // spawnShelf(x, y);
+                console.log("A wild BOX appears!");
+                this.madeBox = true;
+            }
+        } else if(messChance === typeRoll){
+            //spawnMess(x, y);
+            console.log("A wild MESS appears!");
+        }else if(customerChance === typeRoll){
+            //spawnCustomer(x, y);
+            console.log("A wild CUSTOMER appears!");
+        }
+        
+    }
+
+    spawnBox(x, y){
+        let box = this.boxes.create(x, y, "sprites", "box"); //flag note change to box
+
+        box.setScale(1);
+        box.body.allowGravity = false;
+        box.body.immovable = true;
+        box.body.velocity.y = this.platMod*this.scroll;
+        box.body.checkCollision.left = false;
+        box.body.checkCollision.right = false;
+        box.body.checkCollision.down = false;
+        box.setFrictionX(1);
+    }
+
+    spawnShelf(x, y){
+        let shelf = this.shelves.create(x, y, "sprites", "shelfEmpty"); //flag note change to shelf
+
+        shelf.setScale(1);
+        shelf.body.allowGravity = false;
+        shelf.body.immovable = true;
+        shelf.body.velocity.y = this.platMod*this.scroll;
+        shelf.body.checkCollision.left = false;
+        shelf.body.checkCollision.right = false;
+        shelf.body.checkCollision.down = false;
+        shelf.setFrictionX(1);
     }
 
 }

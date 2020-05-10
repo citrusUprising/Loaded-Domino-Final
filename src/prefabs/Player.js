@@ -11,6 +11,7 @@ class Player extends Phaser.GameObjects.Sprite {
 
         this.speed = 300;
         this.jumpHeight = -400;
+        this.hasBox = false;
 
         //this.speedUp = 400;
         //this.maxSpeed = 800;
@@ -34,6 +35,10 @@ class Player extends Phaser.GameObjects.Sprite {
             this.body.velocity.x = this.speed; //flag audio?
         }
 
+        //limit speed if carrying a box
+        if(this.hasBox)this.speed = 200;
+        else this.speed = 300;
+
         /*
         // limit speed to this.maxSpeed
         if (this.body.velocity.x > this.maxSpeed) {
@@ -44,11 +49,14 @@ class Player extends Phaser.GameObjects.Sprite {
         */
 
         if (this.isJump) {
-            this.anims.play("playerAir", true);
+            if(this.hasBox)this.anims.play("playerAir", true);//flag change to box jump sprite
+            else this.anims.play("playerAir", true);
         } else if(keyLEFT.isDown || keyRIGHT.isDown){
-            this.anims.play("playerRun", true);
+            if(this.hasBox)this.anims.play("playerRun", true);//flag change to box run sprite
+            else this.anims.play("playerRun", true);
         }else{
-            this.anims.play("playerIdle");
+            if(this.hasBox)this.anims.play("playerIdle");//flag change to box idle sprite
+            else this.anims.play("playerIdle");
         }
 
 
