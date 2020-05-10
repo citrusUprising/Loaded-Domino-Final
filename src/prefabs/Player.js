@@ -83,7 +83,7 @@ class Player extends Phaser.GameObjects.Sprite {
         if (!this.isJump && Phaser.Input.Keyboard.JustDown(keySPACE)) {
             this.body.velocity.y = this.jumpHeight;
             this.isJump = true;
-            this.scene.sound.play("sfxJump", {volume: 0.25});
+            this.scene.sound.play("sfxJump", {volume: 0.4*game.settings.effectVolume});
         }
         
     }

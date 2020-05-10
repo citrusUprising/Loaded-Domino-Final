@@ -20,7 +20,7 @@ let config = {
 	type: Phaser.CANVAS, /*Loads 2d web renderer*/
 	width: 960, /*game width (adjustable)*/
 	height: 540, /*game height (adjustable)*/
-	scene: [ Menu, Tutorial, Play, Credits ],
+	scene: [ Menu, Tutorial, Play, Credits, Settings ],
 	physics: {
 		default: "arcade",
 		arcade: {
@@ -39,6 +39,8 @@ game.settings = {
 	tutorOpen: false,
 	playing: false,
 	bgm: null,
+	musicVolume: 1,
+	effectVolume: 1,
 }
 
 // define key constants

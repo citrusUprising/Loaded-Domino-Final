@@ -62,11 +62,11 @@ class Play extends Phaser.Scene {
         //sets up music
         let musicPlayConfig = {
             mute: false,
-            volume: .6,
+            volume: .6*game.settings.musicVolume,
             loop: true
         }
 
-        musicPlayConfig.volume = .6;
+        musicPlayConfig.volume = .6*game.settings.musicVolume;
 
         if (!game.settings.playing) {
             this.bgm = this.sound.add('gameMusic', musicPlayConfig);
@@ -198,14 +198,14 @@ class Play extends Phaser.Scene {
                 //console.log("game over, eaten by void");
                 this.finScore = this.score;
                 this.gameoverTop = true;
-                this.sound.play("sfxConsume", {volume: 0.25});
+                this.sound.play("sfxConsume", {volume: 0.4*game.settings.effectVolume});
 
             } else if (this.player.y > game.config.height+50) {
 
                 //console.log("game over, fell off screen");
                 this.finScore = this.score;
                 this.gameoverBot = true;
-                this.sound.play("sfxFall", {volume: 0.25});
+                this.sound.play("sfxFall", {volume: 0.4*game.settings.effectVolume});
 
             }
 
@@ -214,7 +214,7 @@ class Play extends Phaser.Scene {
         // else, if player's dead
         } else {
 
-            this.bgm.volume =.2;
+            this.bgm.volume =.2*game.settings.musicVolume;
 
             // game over!
             //this.menuConfig.fixedWidth = 0; //flag
@@ -268,7 +268,7 @@ class Play extends Phaser.Scene {
             // reset scene
             if (Phaser.Input.Keyboard.JustDown(keyUP)) {
                 game.settings.oozeSpeed = 0;
-                this.bgm.volume =.6;
+                this.bgm.volume =.6*game.settings.musicVolume;
                 this.scene.restart();           
             }
             if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
@@ -300,9 +300,9 @@ class Play extends Phaser.Scene {
 
         let sx = Phaser.Math.RND.between(this.xL, this.xR);
         this.xL = sx-(game.config.width*2/3);
-        if (this.xL < -25)this.xL = -25;
+        if (this.xL < -25)this.xL = 0;
         this.xR = sx+(game.config.width*2/3);
-        if (this.xR > game.config.width+25)this.xR = game.config.width+25;
+        if (this.xR > game.config.width+25)this.xR = game.config.width;
         //console.log(sx);
 
         let platform = this.platforms.create(sx, game.config.height+50, "sprites", "rampsmall");

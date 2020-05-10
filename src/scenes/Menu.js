@@ -30,7 +30,7 @@ class Menu extends Phaser.Scene {
 
         let musicConfig = {
             mute: false,
-            volume: .4,
+            volume: .5*game.settings.musicVolume,
             loop: true
         }
 
@@ -81,18 +81,24 @@ class Menu extends Phaser.Scene {
             'SHELVING CRISIS', titleConfig).setOrigin(0.5);*/
 
         // add titlescreen text
+        
         this.add.text (
             centerX, centerY, 
-            'Press ← to start Tutorial', menuConfig
+            'Press (up) to start Tutorial', menuConfig
         ).setOrigin(0.5);
 
         this.add.text (
             centerX, centerY+textSpacer, 
+            'Press ← to change Settings', menuConfig
+        ).setOrigin(0.5);
+
+        this.add.text (
+            centerX, centerY+2*textSpacer, 
             'Press → to start Game', menuConfig
         ).setOrigin(0.5); 
 
         this.add.text (
-            centerX, centerY+2*textSpacer, 
+            centerX, centerY+3*textSpacer, 
             'Press ↓ to view Credits', menuConfig
         ).setOrigin(0.5); 
         
@@ -100,16 +106,23 @@ class Menu extends Phaser.Scene {
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
+        keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
     
     }
 
     update() {
 
-        if (Phaser.Input.Keyboard.JustDown(keyLEFT)) {
+        if (Phaser.Input.Keyboard.JustDown(keyUP)) {
             // go to tutorial
             //this.sound.play('name');
             game.settings.tutorOpen = true;
             this.scene.start("tutorialScene");
+        }
+        if (Phaser.Input.Keyboard.JustDown(keyLEFT)) {
+            // go to Settings
+            //this.sound.play('name');
+            game.settings.tutorOpen = true;
+            this.scene.start("settingScene");
         }
         if (Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
             //go to game
