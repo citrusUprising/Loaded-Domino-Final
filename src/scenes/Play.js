@@ -76,8 +76,14 @@ class Play extends Phaser.Scene {
         
         //speed of scrolling
         this.scroll = 1;
+
+        // cam note: what is platMod? the scale of scrolling speed? a little confused
         this.platMod = -60;   
+
         this.score = 0;   
+
+        // boolean that determines whether a box or shelf comes next
+        this.madeBox = false;
 
         //platform generation
         this.xL = 0;
@@ -322,6 +328,23 @@ class Play extends Phaser.Scene {
         platform.body.checkCollision.down = false;
         platform.setFrictionX(1);
 
+        // 30% chance of spawning box / shelf
+        let boxShelfChance = 30;
+
+        let spawnRoll = Phaser.Math.RND.between(0, 100);
+
+        // could modify this to spawn other stuff in the same code
+        if (spawnRoll <= boxShelfChance) {
+            if (this.madeBox) {
+                // shelf spawning code here
+                console.log("A wild SHELF appears!");
+                this.madeBox = false;
+            } else {
+                // shelf spawning code here
+                console.log("A wild BOX appears!");
+                this.madeBox = true;
+            }
+        }
     }
 
     scoreUp() {
