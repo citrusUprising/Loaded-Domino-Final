@@ -109,6 +109,9 @@ class Play extends Phaser.Scene {
         //group for shelf collisions
         this.shelves = this.physics.add.group();
 
+        //group for full shelf existance
+        this.fullShelves = this.physics.add.group();
+
         //group for mess collisions
 
         //group for customer collisions
@@ -132,6 +135,10 @@ class Play extends Phaser.Scene {
 			box.body.allowGravity = false;
             box.body.immovable = true;
             box.body.velocity.y = this.platMod*this.scroll;
+            box.body.checkCollision.up = false;
+            box.body.checkCollision.left = false;
+            box.body.checkCollision.right = false;
+            box.body.checkCollision.down = false;
             box.setFrictionX(1);
         }, this);
         
@@ -140,7 +147,24 @@ class Play extends Phaser.Scene {
 			shelf.body.allowGravity = false;
             shelf.body.immovable = true;
             shelf.body.velocity.y = this.platMod*this.scroll;
+            shelf.body.checkCollision.up = false;
+            shelf.body.checkCollision.left = false;
+            shelf.body.checkCollision.right = false;
+            shelf.body.checkCollision.down = false;
             shelf.setFrictionX(1);
+        }, this);
+
+        // iterate through full shelves group, set variables
+
+        this.fullShelves.children.each(function(fullShelf) {
+			fullShelf.body.allowGravity = false;
+            fullShelf.body.immovable = true;
+            fullShelf.body.velocity.y = this.platMod*this.scroll;
+            fullShelf.body.checkCollision.up = false;
+            fullShelf.body.checkCollision.left = false;
+            fullShelf.body.checkCollision.right = false;
+            fullShelf.body.checkCollision.down = false;
+            fullShelf.setFrictionX(1);
         }, this);
         
         //iterate throuhg full shelf, set variable
@@ -157,7 +181,7 @@ class Play extends Phaser.Scene {
         this.physics.world.setBounds(0, -100, game.config.width, game.config.height+200);
 
 		// add player with physics
-		this.player = new Player(this, game.config.width/2, 150, "sprites", "run1").setOrigin(0.5,0.5);
+		this.player = new Player(this, game.config.width/2, 150, "sprites", "run1").setOrigin(0.5);
         this.physics.add.existing(this.player);
 
         // set player body size, 10 pixel gap on left + right
@@ -221,6 +245,10 @@ class Play extends Phaser.Scene {
         this.shelves.children.each(function(shelf) {
             shelf.setDepth(-997);
         }, this);
+
+        this.fullShelves.children.each(function(fullShelf) {
+            fullShelf.setDepth(-997);
+        }, this);
         
         // if player hasn't died yet
         if (!this.gameoverTop && !this.gameoverBot) {
@@ -249,6 +277,8 @@ class Play extends Phaser.Scene {
             this.shelves.children.each(function(shelf) {
                 if (shelf.y < this.void.y-shelf.height) {
                     shelf.destroy();
+                    console.log('anxiety +1');
+                    //flag Ooze y max += ?
                 }
             }, this);
 
@@ -332,9 +362,17 @@ class Play extends Phaser.Scene {
                 platform.body.velocity.y = 0;
             }, this);
 
-            //flag add boxes
+            this.boxes.children.each(function(box) {
+                box.body.velocity.y = 0;
+            }, this);
 
-            //flag add shelves
+            this.shelves.children.each(function(shelf) {
+                shelf.body.velocity.y = 0;
+            }, this);
+
+            this.fullShelves.children.each(function(fullShelf) {
+                fullShelf.body.velocity.y = 0;
+            }, this);
 
             // reset scene
             if (Phaser.Input.Keyboard.JustDown(keyUP)) {
@@ -366,15 +404,26 @@ class Play extends Phaser.Scene {
 
     }
 
-    playerGrabBox(player, box) {
-        if(!player.hasBox){
+    playerGrabBox(player, box) {//will not work if player is moving (bug or feature?)
+        if(!player.hasBox&&Phaser.Input.Keyboard.JustDown(keyDOWN)){
             player.hasBox = true;
             box.destroy();
         }
+        if ((player.y + player.height) < box.y) {
+            player.isJump = false;
+        }
     }
 
-    playerShelving(player, shelf) {
-
+    playerShelving(player, shelf) {//will not work if player is moving (bug or feature?)
+        if(player.hasBox&&Phaser.Input.Keyboard.JustDown(keyDOWN)){
+            player.hasBox = false;
+            shelf.destroy();
+            //spawn full shelf sprite
+            this.spawnFullShelf(shelf.x, shelf.y)
+        }
+        if ((player.y + player.height) < shelf.y) {
+            player.isJump = false;
+        }
     }
 
     // spawn platform randomly at bottom of screen
@@ -406,7 +455,7 @@ class Play extends Phaser.Scene {
         // runs code to determine what object is spawned
         if (spawnRoll <= objectChance) {
             let xRandom = Phaser.Math.RND.between(sx-50, sx+50);
-            this.spawnObject(xRandom, game.config.height+50);
+            this.spawnObject(xRandom, game.config.height+50-(platform.height/2));
         }
     }
 
@@ -421,11 +470,25 @@ class Play extends Phaser.Scene {
                 this.scroll += 0.2;
                 this.platformTimer.timeScale = 1 + (0.2*this.scroll);
                 
-                //update speed of existing platforms
+                //update speed of existing platforms and objects
                 //code provided by Ben Rosien in the discord channel
+                {
                 this.platforms.getChildren().forEach(function (platform) {
                     platform.body.velocity.y = this.scroll*this.platMod;
                 }, this);
+
+                this.boxes.getChildren().forEach(function (box) {
+                    box.body.velocity.y = this.scroll*this.platMod;
+                }, this);
+
+                this.shelves.getChildren().forEach(function (shelf) {
+                    shelf.body.velocity.y = this.scroll*this.platMod;
+                }, this);
+
+                this.fullShelves.getChildren().forEach(function (fullShelf) {
+                    fullShelf.body.velocity.y = this.scroll*this.platMod;
+                }, this);
+                }
 
                 game.settings.oozeSpeed = 0;
 
@@ -448,21 +511,21 @@ class Play extends Phaser.Scene {
         let typeRoll = Phaser.Math.RND.between(1, 3);
 
         if(boxShelfChance <= typeRoll){//change to == once other methods implemented
-            if (this.madeBox) {
-                // spawnBox(x, y);
-                console.log("A wild SHELF appears!");
-                this.madeBox = false;
-            } else {
-                // spawnShelf(x, y);
-                console.log("A wild BOX appears!");
+            if (!this.madeBox) {
+                this.spawnBox(x, y);
+                //console.log("A wild SHELF appears!");
                 this.madeBox = true;
+            } else {
+                this.spawnShelf(x, y); 
+                //console.log("A wild BOX appears!");
+                this.madeBox = false;
             }
         } else if(messChance === typeRoll){
             //spawnMess(x, y);
-            console.log("A wild MESS appears!");
+            //console.log("A wild MESS appears!");
         }else if(customerChance === typeRoll){
             //spawnCustomer(x, y);
-            console.log("A wild CUSTOMER appears!");
+            //console.log("A wild CUSTOMER appears!");
         }
         
     }
@@ -471,9 +534,11 @@ class Play extends Phaser.Scene {
         let box = this.boxes.create(x, y, "sprites", "BoxTemp");
 
         box.setScale(1);
+        box.setOrigin(.5,1);
         box.body.allowGravity = false;
         box.body.immovable = true;
         box.body.velocity.y = this.platMod*this.scroll;
+        box.body.checkCollision.up = false;
         box.body.checkCollision.left = false;
         box.body.checkCollision.right = false;
         box.body.checkCollision.down = false;
@@ -484,9 +549,26 @@ class Play extends Phaser.Scene {
         let shelf = this.shelves.create(x, y, "sprites", "ShelfEmptyTemp");
 
         shelf.setScale(1);
+        shelf.setOrigin(.5,1);
         shelf.body.allowGravity = false;
         shelf.body.immovable = true;
         shelf.body.velocity.y = this.platMod*this.scroll;
+        shelf.body.checkCollision.up = false;
+        shelf.body.checkCollision.left = false;
+        shelf.body.checkCollision.right = false;
+        shelf.body.checkCollision.down = false;
+        shelf.setFrictionX(1);
+    }
+
+    spawnFullShelf(x, y){
+        let shelf = this.fullShelves.create(x, y, "sprites", "ShelfFullTemp");
+
+        shelf.setScale(1);
+        shelf.setOrigin(.5,1);
+        shelf.body.allowGravity = false;
+        shelf.body.immovable = true;
+        shelf.body.velocity.y = this.platMod*this.scroll;
+        shelf.body.checkCollision.up = false;
         shelf.body.checkCollision.left = false;
         shelf.body.checkCollision.right = false;
         shelf.body.checkCollision.down = false;

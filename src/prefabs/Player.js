@@ -36,7 +36,7 @@ class Player extends Phaser.GameObjects.Sprite {
         }
 
         //limit speed if carrying a box
-        if(this.hasBox)this.speed = 200;
+        if(this.hasBox)this.speed = 250;
         else this.speed = 300;
 
         /*
