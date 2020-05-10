@@ -14,8 +14,12 @@ class Play extends Phaser.Scene {
 
         // load sprite atlas
         this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
-        this.load.spritesheet("void1", "assets/void1.png", {frameWidth: 960, frameHeight :1050, startFrame: 0,
-            endFrame: 29});
+
+        // load void spritesheet
+        this.load.spritesheet("void1", "assets/void1.png", {
+            frameWidth: 960, frameHeight :1050,
+            startFrame: 0, endFrame: 29
+        });
     }
 
     create(){
@@ -244,7 +248,6 @@ class Play extends Phaser.Scene {
 
             this.shelves.children.each(function(shelf) {
                 if (shelf.y < this.void.y-shelf.height) {
-
                     shelf.destroy();
                 }
             }, this);
@@ -281,7 +284,7 @@ class Play extends Phaser.Scene {
             this.bgm.volume =.2*game.settings.musicVolume;
 
             // game over!
-            //this.menuConfig.fixedWidth = 0; //flag
+            //this.menuConfig.fixedWidth = 0;
 
             let GOConfig = {
                 fontFamily: 'Helvetica',
@@ -465,7 +468,7 @@ class Play extends Phaser.Scene {
     }
 
     spawnBox(x, y){
-        let box = this.boxes.create(x, y, "sprites", "box"); //flag note change to box
+        let box = this.boxes.create(x, y, "sprites", "BoxTemp");
 
         box.setScale(1);
         box.body.allowGravity = false;
@@ -478,7 +481,7 @@ class Play extends Phaser.Scene {
     }
 
     spawnShelf(x, y){
-        let shelf = this.shelves.create(x, y, "sprites", "shelfEmpty"); //flag note change to shelf
+        let shelf = this.shelves.create(x, y, "sprites", "ShelfEmptyTemp");
 
         shelf.setScale(1);
         shelf.body.allowGravity = false;
