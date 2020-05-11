@@ -436,7 +436,7 @@ class Play extends Phaser.Scene {
         if (this.xR > game.config.width+25)this.xR = game.config.width;
         //console.log(sx);
 
-        let platform = this.platforms.create(sx, game.config.height+50, "sprites", "rampsmall");
+        let platform = this.platforms.create(sx, game.config.height+100, "sprites", "rampsmall");
 
         platform.setScale(1);
         platform.body.allowGravity = false;
@@ -454,8 +454,10 @@ class Play extends Phaser.Scene {
 
         // runs code to determine what object is spawned
         if (spawnRoll <= objectChance) {
-            let xRandom = Phaser.Math.RND.between(sx-50, sx+50);
-            this.spawnObject(xRandom, game.config.height+50-(platform.height/2));
+            let xRandom = Phaser.Math.RND.between(sx-100, sx+100);
+            if (xRandom < 50) xRandom = 50;
+            if (xRandom > game.config.width-50) xRandom = game.config.width-50;
+            this.spawnObject(xRandom, game.config.height+100-(platform.height/2));
         }
     }
 
@@ -513,11 +515,11 @@ class Play extends Phaser.Scene {
         if(boxShelfChance <= typeRoll){//change to == once other methods implemented
             if (!this.madeBox) {
                 this.spawnBox(x, y);
-                //console.log("A wild SHELF appears!");
+                //console.log("A wild BOX appears!");
                 this.madeBox = true;
             } else {
                 this.spawnShelf(x, y); 
-                //console.log("A wild BOX appears!");
+                //console.log("A wild SHELF appears!");
                 this.madeBox = false;
             }
         } else if(messChance === typeRoll){
