@@ -25,7 +25,7 @@ class Play extends Phaser.Scene {
     create(){
 
         // create warehouse backdrop
-        this.background = this.add.tileSprite(0, 0, 960, 540, "backDrop").setOrigin(0,0);
+        this.background = this.add.tileSprite(0, 0, 960, 540, "backDrop").setOrigin(0,0).setScale(4/3); //flag remove set scale on asset change
         this.background.setDepth(-999);
 
         this.anims.create({
@@ -82,7 +82,8 @@ class Play extends Phaser.Scene {
         this.scroll = 1;
 
         // cam note: what is platMod? the scale of scrolling speed? a little confused
-        this.platMod = -60;   
+        //sean: it's a multiplier applied to platform scrolling speed, otherwise platforms go down and are WAY slower than the background
+        this.platMod = -80; //flag (-60 @ 540p)   
 
         this.score = 0;   
 
@@ -201,7 +202,7 @@ class Play extends Phaser.Scene {
         this.gameoverBot = false;
 
         // OOZE or VOID creation
-        this.void = new Ooze(this, 0, 0, 'void', 0).setOrigin(0, 1);
+        this.void = new Ooze(this, 0, 0, 'void', 0).setOrigin(0, 1).setScale(4/3); //flag remove set scale on asset change
 
         let menuConfig = {
             fontFamily: 'Helvetica',
@@ -430,9 +431,9 @@ class Play extends Phaser.Scene {
     makePlatform() {
 
         let sx = Phaser.Math.RND.between(this.xL, this.xR);
-        this.xL = sx-(game.config.width*2/3);
+        this.xL = sx-(game.config.width*.5); //flag (*2/3) in 540p
         if (this.xL < -25)this.xL = 0;
-        this.xR = sx+(game.config.width*2/3);
+        this.xR = sx+(game.config.width*.5); //flag (*2/3) in 540p
         if (this.xR > game.config.width+25)this.xR = game.config.width;
         //console.log(sx);
 

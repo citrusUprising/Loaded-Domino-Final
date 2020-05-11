@@ -26,7 +26,7 @@ class Menu extends Phaser.Scene {
     create() {
 
         // add title backdrop
-        this.backdrop = this.add.tileSprite(0, 0, 960, 540, "title").setOrigin(0,0);
+        this.backdrop = this.add.tileSprite(0, 0, 960, 540, "title").setOrigin(0,0).setScale(4/3); //flag remove set scale on asset change
 
         let musicConfig = {
             mute: false,
