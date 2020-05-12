@@ -455,7 +455,7 @@ class Play extends Phaser.Scene {
 
         // runs code to determine what object is spawned
         if (spawnRoll <= objectChance) {
-            let xRandom = Phaser.Math.RND.between(sx-100, sx+100);
+            let xRandom = Phaser.Math.RND.between(sx-100, sx+100); // flag make sure number is <= (platform width-largest object width)/2
             if (xRandom < 50) xRandom = 50;
             if (xRandom > game.config.width-50) xRandom = game.config.width-50;
             this.spawnObject(xRandom, game.config.height+100-(platform.height/2));
@@ -549,7 +549,7 @@ class Play extends Phaser.Scene {
     }
 
     spawnShelf(x, y){
-        let shelf = this.shelves.create(x, y, "sprites", "ShelfEmptyTemp");
+        let shelf = this.shelves.create(x, y, "sprites", "ShelfEmptyTemp"); //change size of sprite??
 
         shelf.setScale(1);
         shelf.setOrigin(.5,1);
@@ -564,7 +564,7 @@ class Play extends Phaser.Scene {
     }
 
     spawnFullShelf(x, y){
-        let shelf = this.fullShelves.create(x, y, "sprites", "ShelfFullTemp");
+        let shelf = this.fullShelves.create(x, y, "sprites", "ShelfFullTemp"); //change size of sprite??
 
         shelf.setScale(1);
         shelf.setOrigin(.5,1);
