@@ -495,9 +495,9 @@ class Play extends Phaser.Scene {
                 }, this);
                 }
 
-                game.settings.oozeSpeed = 0;
+                game.settings.oozeSpeed = 0; //flag remove
 
-            } else if ((this.score%20 == 10) && (this.void.y < (game.config.height/4))) {
+            } else if ((this.score%20 == 10) && (this.void.y < (game.config.height/4))) { //flag remove whole if statement
         
                 game.settings.oozeSpeed = 0.05;
         
