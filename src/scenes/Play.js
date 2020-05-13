@@ -344,7 +344,7 @@ class Play extends Phaser.Scene {
             this.add.text (game.config.width/2, game.config.height/2+textSpacer, 'Press ↑ to try again', GOConfig).setOrigin(0.5);
             this.add.text (game.config.width/2, game.config.height/2+2*textSpacer, 'Press ↓ to return to menu', GOConfig).setOrigin(0.5);
 
-            if (this.gameoverTop)game.settings.oozeSpeed = 10;
+            if (this.gameoverTop)game.settings.oozeSpeed = 10; //flag remove
 
             // turn off player movement
             this.player.body.velocity.x = 0;
@@ -377,20 +377,22 @@ class Play extends Phaser.Scene {
 
             // reset scene
             if (Phaser.Input.Keyboard.JustDown(keyUP)) {
-                game.settings.oozeSpeed = 0;
+                game.settings.oozeSpeed = 0; //flag remove
+                //set ooze limit to 0
                 this.bgm.volume =.6*game.settings.musicVolume;
                 this.scene.restart();           
             }
             if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
                 game.settings.playing = false;
                 this.bgm.stop();
-                game.settings.oozeSpeed = 0;
+                game.settings.oozeSpeed = 0; //flag remove
+                //set ooze limit to 0
                 this.scene.start("menuScene");
             }
         } 
 
         //moves void, but not past screen
-        if(this.void.y < game.config.height+100&&!this.gameoverBot)this.void.update();
+        if(this.void.y < game.config.height+100&&!this.gameoverBot)this.void.update(); //flag ooze limit
         else  game.settings.oozeSpeed = 0;
 
     }
