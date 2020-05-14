@@ -458,7 +458,7 @@ class Play extends Phaser.Scene {
         platform.setFrictionX(1);
 
         // 30% chance of spawning box / shelf
-        let objectChance = 100; //remember to make this 30 again
+        let objectChance = 30; //remember to make this 30 again
 
         let spawnRoll = Phaser.Math.RND.between(0, 100);
 
