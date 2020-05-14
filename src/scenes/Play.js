@@ -35,7 +35,7 @@ class Play extends Phaser.Scene {
         this.background.setDepth(-999);
         //this.physics.add.existing(this.background);
         //this.background.body.allowGravity = false;
-        //this.background.body.immovable = true;
+       // this.background.body.immovable = true;
         //this.background.body.checkCollision.none = true;
         //this.background.body.setVelocityY(this.scroll*this.platMod);
 
@@ -72,7 +72,45 @@ class Play extends Phaser.Scene {
         this.anims.create({
 			key: "playerAir",
 			frames: [{ key: "sprites", frame: "jump" }]
-		});
+        });
+
+        /*
+        this.anims.create({
+			key: "playerWork",
+			frames: this.anims.generateFrameNames("sprites", {
+				prefix: "work",
+				start: 1,
+				end: 24,
+                zeroPad: 0
+			}),
+            frameRate: 60,
+            repeat: -1
+        });
+        */
+
+        this.anims.create({
+			key: "smell",
+			frames: this.anims.generateFrameNames("sprites", {
+				prefix: "mess",
+				start: 1,
+				end: 2,
+                zeroPad: 0
+			}),
+            frameRate: 15, //flag
+            repeat: -1
+        });
+
+        this.anims.create({
+			key: "customerBump",
+			frames: this.anims.generateFrameNames("sprites", {
+				prefix: "customer",
+				start: 1,
+				end: 14,
+                zeroPad: 0
+			}),
+            frameRate: 20,//flag
+            repeat: 0
+        });  
 
         //sets up music
         let musicPlayConfig = {
@@ -118,8 +156,13 @@ class Play extends Phaser.Scene {
         this.fullShelves = this.physics.add.group();
 
         //group for mess collisions
+        this.messes = this.physics.add.group();
 
         //group for customer collisions
+        this.customers = this.physics.add.group();
+
+        //group for angry customers
+        this.agCustomers = this.physics.add.group();
         
         // starting platform
 		this.platforms.create(game.config.width/2, game.config.height+50, "sprites", "rampsmall").setScale(1);
@@ -160,8 +203,7 @@ class Play extends Phaser.Scene {
         }, this);
 
         // iterate through full shelves group, set variables
-
-        this.fullShelves.children.each(function(fullShelf) {
+            this.fullShelves.children.each(function(fullShelf) {
 			fullShelf.body.allowGravity = false;
             fullShelf.body.immovable = true;
             fullShelf.body.velocity.y = this.platMod*this.scroll;
@@ -172,7 +214,37 @@ class Play extends Phaser.Scene {
             fullShelf.setFrictionX(1);
         }, this);
         
-        //iterate throuhg full shelf, set variable
+        //iterate throuhg messes group, set variables
+        this.messes.children.each(function(mess) {
+			mess.body.allowGravity = false;
+            mess.body.immovable = true;
+            mess.body.velocity.y = this.platMod*this.scroll;
+            mess.body.checkCollision.up = false;
+            mess.body.checkCollision.left = false;
+            mess.body.checkCollision.right = false;
+            mess.body.checkCollision.down = false;
+            mess.setFrictionX(1);
+        }, this);
+
+        //iterate throuhg customer group, set variables
+        this.customers.children.each(function(customer) {
+			customer.body.allowGravity = false;
+            customer.body.immovable = true;
+            customer.body.velocity.y = this.platMod*this.scroll;
+            customer.setFrictionX(1);
+        }, this);
+
+        //iterate throuhg angry customer group, set variables
+        this.agCustomers.children.each(function(agCustomer) {
+			agCustomer.body.allowGravity = false;
+            agCustomer.body.immovable = true;
+            agCustomer.body.velocity.y = this.platMod*this.scroll;
+            agCustomer.body.checkCollision.up = false;
+            agCustomer.body.checkCollision.left = false;
+            agCustomer.body.checkCollision.right = false;
+            agCustomer.body.checkCollision.down = false;
+            agCustomer.setFrictionX(1);
+        }, this);
 
         // add timer for spawning platforms (possibly temporary method?)
         this.platformTimer = this.time.addEvent ({
@@ -200,6 +272,8 @@ class Play extends Phaser.Scene {
         this.physics.add.collider(this.player, this.platforms, this.playerHitPlatform, null, this);
         this.physics.add.collider(this.player, this.boxes, this.playerGrabBox, null, this);
         this.physics.add.collider(this.player, this.shelves, this.playerShelving, null, this);
+        this.physics.add.collider(this.player, this.messes, this.playerCleaning, null, this);
+        this.physics.add.collider(this.player, this.customers, this.playerBumping, null, this);
 
         //separate gameover variables depending on death
         this.gameoverTop = false;
@@ -256,12 +330,24 @@ class Play extends Phaser.Scene {
         this.fullShelves.children.each(function(fullShelf) {
             fullShelf.setDepth(-997);
         }, this);
+
+        this.messes.children.each(function(mess) {
+            mess.setDepth(-997);
+        }, this);
+
+        this.customers.children.each(function(customer) {
+            customer.setDepth(-997);
+        }, this);
+
+        this.agCustomers.children.each(function(agCustomer) {
+            agCustomer.setDepth(-997);
+        }, this);
         
         // if player hasn't died yet
         if (!this.gameoverTop && !this.gameoverBot) {
  
             // update scrolling background
-            this.background.tilePositionY += delta/20;
+            this.background.tilePositionY += this.scroll*delta*2/33;
  
             // update player
             this.player.update();
@@ -284,6 +370,28 @@ class Play extends Phaser.Scene {
             this.shelves.children.each(function(shelf) {
                 if (shelf.y < this.ooze.y-shelf.height) {
                     shelf.destroy();
+                    // creep ooze down
+                    this.oozeCreep();
+                }
+            }, this);
+
+            this.messes.children.each(function(mess) {
+                if (mess.y < this.ooze.y-mess.height) {
+                    mess.destroy();
+                    // creep ooze down
+                    this.oozeCreep();
+                }
+            }, this);
+
+            this.customers.children.each(function(customer) {
+                if (customer.y < this.ooze.y-customer.height) {
+                    customer.destroy();
+                }
+            }, this);
+
+            this.agCustomers.children.each(function(agCustomer) {
+                if (agCustomer.y < this.ooze.y-agCustomer.height) {
+                    agCustomer.destroy();
                     // creep ooze down
                     this.oozeCreep();
                 }
@@ -378,6 +486,18 @@ class Play extends Phaser.Scene {
                 fullShelf.body.velocity.y = 0;
             }, this);
 
+            this.messes.children.each(function(mess) {
+                mess.body.velocity.y = 0;
+            }, this);
+
+            this.customers.children.each(function(customer) {
+                customer.body.velocity.y = 0;
+            }, this);
+
+            this.agCustomers.children.each(function(agCustomer) {
+                agCustomer.body.velocity.y = 0;
+            }, this);
+
             // reset scene
             if (Phaser.Input.Keyboard.JustDown(keyUP)) {
                 this.bgm.volume =.6*game.settings.musicVolume;
@@ -417,23 +537,34 @@ class Play extends Phaser.Scene {
             player.hasBox = true;
             box.destroy();
         }
-        // cam note: do we want this? it looks buggy
-        if ((player.y + player.height) < box.y) {
-            player.isJump = false;
-        }
     }
 
     playerShelving(player, shelf) {//will not work if player is moving (bug or feature?)
         if(player.hasBox&&Phaser.Input.Keyboard.JustDown(keyDOWN)){
             player.hasBox = false;
-            shelf.destroy();
-            //spawn full shelf sprite
-            this.spawnFullShelf(shelf.x, shelf.y)
+            player.isWork = true;
+            let timer = this.time.delayedCall(500, () => {
+                player.isWork = false;
+                //spawn full shelf sprite
+                this.spawnFullShelf(shelf.x, shelf.y)
+                shelf.destroy();
+            }, null, this);
         }
-        // cam note: do we want this? it looks buggy
-        if ((player.y + player.height) < shelf.y) {
-            player.isJump = false;
+    }
+
+    playerCleaning(player, mess){
+        if(Phaser.Input.Keyboard.JustDown(keyDOWN)){
+            player.isWork = true;
+            let timer = this.time.delayedCall(750, () => {
+                player.isWork = false;
+                mess.destroy();
+            }, null, this);
         }
+    }
+
+    playerBumping(player, customer){
+        this.spawnAngryCustomer(customer.x,customer.y);
+        customer.destroy();
     }
 
     // spawn platform randomly at bottom of screen
@@ -458,7 +589,7 @@ class Play extends Phaser.Scene {
         platform.setFrictionX(1);
 
         // 30% chance of spawning box / shelf
-        let objectChance = 30; //remember to make this 30 again
+        let objectChance = 50; //remember to make this 30 again
 
         let spawnRoll = Phaser.Math.RND.between(0, 100);
 
@@ -500,6 +631,18 @@ class Play extends Phaser.Scene {
                 this.fullShelves.getChildren().forEach(function (fullShelf) {
                     fullShelf.body.velocity.y = this.scroll*this.platMod;
                 }, this);
+
+                this.messes.getChildren().forEach(function (mess) {
+                    mess.body.velocity.y = this.scroll*this.platMod;
+                }, this);
+
+                this.customers.getChildren().forEach(function (customer) {
+                    customer.body.velocity.y = this.scroll*this.platMod;
+                }, this);
+
+                this.agCustomers.getChildren().forEach(function (agCustomer) {
+                    agCustomer.body.velocity.y = this.scroll*this.platMod;
+                }, this);
             
             }
     
@@ -509,13 +652,13 @@ class Play extends Phaser.Scene {
     spawnObject(x, y){
 
         //needs an order
-        let boxShelfChance = 1;
-        let messChance = 0;
-        let customerChance = 0;
+        let boxShelfChance = 3;
+        let messChance = 2;
+        let customerChance = 1;
 
-        let typeRoll = Phaser.Math.RND.between(1, 3);
+        let typeRoll = Phaser.Math.RND.between(1, 3);//change to 1, 3
 
-        if(boxShelfChance <= typeRoll){//change to == once other methods implemented
+        if(boxShelfChance === typeRoll){//change to == once other methods implemented
             if (!this.madeBox) {
                 this.spawnBox(x, y);
                 //console.log("A wild BOX appears!");
@@ -526,17 +669,17 @@ class Play extends Phaser.Scene {
                 this.madeBox = false;
             }
         } else if(messChance === typeRoll){
-            //spawnMess(x, y);
+            this.spawnMess(x, y);
             //console.log("A wild MESS appears!");
         }else if(customerChance === typeRoll){
-            //spawnCustomer(x, y);
+            this.spawnCustomer(x, y);
             //console.log("A wild CUSTOMER appears!");
         }
         
     }
 
     spawnBox(x, y){
-        let box = this.boxes.create(x, y, "sprites", "BoxTemp");
+        let box = this.boxes.create(x, y, "sprites", "Box");
 
         box.setScale(1);
         box.setOrigin(.5,1);
@@ -551,7 +694,7 @@ class Play extends Phaser.Scene {
     }
 
     spawnShelf(x, y){
-        let shelf = this.shelves.create(x, y, "sprites", "ShelfEmptyTemp"); //change size of sprite??
+        let shelf = this.shelves.create(x, y, "sprites", "ShelfEmpty"); //change size of sprite??
 
         shelf.setScale(1);
         shelf.setOrigin(.5,1);
@@ -566,7 +709,7 @@ class Play extends Phaser.Scene {
     }
 
     spawnFullShelf(x, y){
-        let shelf = this.fullShelves.create(x, y, "sprites", "ShelfFullTemp"); //change size of sprite??
+        let shelf = this.fullShelves.create(x, y, "sprites", "ShelfFull"); //change size of sprite??
 
         shelf.setScale(1);
         shelf.setOrigin(.5,1);
@@ -578,6 +721,49 @@ class Play extends Phaser.Scene {
         shelf.body.checkCollision.right = false;
         shelf.body.checkCollision.down = false;
         shelf.setFrictionX(1);
+    }
+
+    spawnMess(x, y){
+        let mess = this.messes.create(x, y, "sprites", "mess1");
+
+        mess.setScale(1);
+        mess.setOrigin(.5,1);
+        mess.body.allowGravity = false;
+        mess.body.immovable = true;
+        mess.body.velocity.y = this.platMod*this.scroll;
+        mess.body.checkCollision.up = false;
+        mess.body.checkCollision.left = false;
+        mess.body.checkCollision.right = false;
+        mess.body.checkCollision.down = false;
+        mess.setFrictionX(1);
+        mess.anims.play("smell");
+    }
+
+    spawnCustomer(x, y){
+        let customer = this.customers.create(x, y, "sprites", "customerNeutral");
+
+        customer.setScale(1);
+        customer.setOrigin(.5,1);
+        customer.body.allowGravity = false;
+        customer.body.immovable = true;
+        customer.body.velocity.y = this.platMod*this.scroll;
+        customer.setFrictionX(1);
+    }
+
+    spawnAngryCustomer(x,y){
+        let agCustomer = this.agCustomers.create(x, y, "sprites", "customerAngry");
+
+        agCustomer.setScale(1);
+        agCustomer.setOrigin(.5,1);
+        agCustomer.body.allowGravity = false;
+        agCustomer.body.immovable = true;
+        agCustomer.body.velocity.y = this.platMod*this.scroll;
+        agCustomer.body.checkCollision.up = false;
+        agCustomer.body.checkCollision.left = false;
+        agCustomer.body.checkCollision.right = false;
+        agCustomer.body.checkCollision.down = false;
+        agCustomer.setFrictionX(1);
+        agCustomer.anims.play('customerBump'); //flag
     }
 
     oozeCreep() {

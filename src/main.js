@@ -41,8 +41,8 @@ game.settings = {
 	tutorOpen: false,
 	playing: false,
 	bgm: null,
-	musicVolume: .5,
-	effectVolume: .5,
+	musicVolume: .0, //flag remember to change to .5
+	effectVolume: .1, //flag remember to change to .5
 }
 
 // define key constants
