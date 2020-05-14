@@ -24,9 +24,20 @@ class Play extends Phaser.Scene {
 
     create(){
 
+        //speed of scrolling
+        this.scroll = 1;
+
+        //mltiplier applied to platform scrolling speed, otherwise platforms go down and are WAY slower than the background
+        this.platMod = -80; //flag (-60 @ 540p)   
+        
         // create warehouse backdrop
         this.background = this.add.tileSprite(0, 0, 960, 540, "backDrop").setOrigin(0,0).setScale(4/3); //flag remove set scale on asset change
         this.background.setDepth(-999);
+        //this.physics.add.existing(this.background);
+        //this.background.body.allowGravity = false;
+        //this.background.body.immovable = true;
+        //this.background.body.checkCollision.none = true;
+        //this.background.body.setVelocityY(this.scroll*this.platMod);
 
         this.anims.create({
             key: 'voider',
@@ -78,13 +89,6 @@ class Play extends Phaser.Scene {
         }
         game.settings.playing = true;
         
-        //speed of scrolling
-        this.scroll = 1;
-
-        // cam note: what is platMod? the scale of scrolling speed? a little confused
-        //sean: it's a multiplier applied to platform scrolling speed, otherwise platforms go down and are WAY slower than the background
-        this.platMod = -80; //flag (-60 @ 540p)   
-
         this.score = 0;   
 
         // boolean that determines whether a box or shelf comes next
@@ -201,8 +205,11 @@ class Play extends Phaser.Scene {
         this.gameoverTop = false;
         this.gameoverBot = false;
 
-        // OOZE or VOID creation
-        this.void = new Ooze(this, 0, 0, 'void', 0).setOrigin(0, 1).setScale(4/3); //flag remove set scale on asset change
+        // ooze creation
+        this.ooze = new Ooze(this, 0, 0, 'void', 0).setOrigin(0, 1).setScale(4/3); //flag remove set scale on asset change
+        this.physics.add.existing(this.ooze);
+        this.ooze.body.allowGravity = false;
+        this.ooze.body.immovable = true;
 
         let menuConfig = {
             fontFamily: 'Helvetica',
@@ -221,8 +228,7 @@ class Play extends Phaser.Scene {
         let centerY = game.config.height/2;
         let textSpacer = 80;
 
-
-        this.scoreBoard = this.add.text (0, 0, this.score, menuConfig);
+        this.scoreBoard = this.add.text(0, 0, this.score, menuConfig);
 
         // assign keys
         keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
@@ -233,7 +239,7 @@ class Play extends Phaser.Scene {
 
     }
 
-    update() {
+    update(time, delta) {
 
         this.platforms.children.each(function(platform) {
             platform.setDepth(-998);
@@ -255,7 +261,7 @@ class Play extends Phaser.Scene {
         if (!this.gameoverTop && !this.gameoverBot) {
  
             // update scrolling background
-            this.background.tilePositionY += this.scroll;
+            this.background.tilePositionY += delta/20;
  
             // update player
             this.player.update();
@@ -270,16 +276,16 @@ class Play extends Phaser.Scene {
 
             //destroy boxes and shelves
             this.boxes.children.each(function(box) {
-                if (box.y < this.void.y-box.height) {
+                if (box.y < this.ooze.y-box.height) {
                     box.destroy();
                 }
             }, this);
 
             this.shelves.children.each(function(shelf) {
-                if (shelf.y < this.void.y-shelf.height) {
+                if (shelf.y < this.ooze.y-shelf.height) {
                     shelf.destroy();
-                    console.log('anxiety +1');
-                    //flag Ooze y max += ?
+                    // creep ooze down
+                    this.oozeCreep();
                 }
             }, this);
 
@@ -291,11 +297,13 @@ class Play extends Phaser.Scene {
             }
 
             // check if player died
-            if (this.player.y < this.void.y) {
+            // give player some leeway so they don't get eaten by particles
+            if (this.player.y < this.ooze.y-80) {
 
-                //console.log("game over, eaten by void");
+                //console.log("game over, eaten by ooze");
                 this.finScore = this.score;
                 this.gameoverTop = true;
+                this.ooze.body.setVelocityY(game.settings.oozeSpeed*10);
                 this.sound.play("sfxConsume", {volume: 0.4*game.settings.effectVolume});
 
             } else if (this.player.y > game.config.height+50) {
@@ -344,8 +352,6 @@ class Play extends Phaser.Scene {
             this.add.text (game.config.width/2, game.config.height/2+textSpacer, 'Press ↑ to try again', GOConfig).setOrigin(0.5);
             this.add.text (game.config.width/2, game.config.height/2+2*textSpacer, 'Press ↓ to return to menu', GOConfig).setOrigin(0.5);
 
-            if (this.gameoverTop)game.settings.oozeSpeed = 10; //flag remove
-
             // turn off player movement
             this.player.body.velocity.x = 0;
 		    this.player.body.velocity.y = 0;
@@ -355,9 +361,6 @@ class Play extends Phaser.Scene {
 
             // stop platforms
             this.platformTimer.paused = true;
-
-            // stop ooze/void
-            //game.settings.oozeSpeed = 0;
 
             this.platforms.children.each(function(platform) {
                 platform.body.velocity.y = 0;
@@ -377,23 +380,25 @@ class Play extends Phaser.Scene {
 
             // reset scene
             if (Phaser.Input.Keyboard.JustDown(keyUP)) {
-                game.settings.oozeSpeed = 0; //flag remove
-                //set ooze limit to 0
                 this.bgm.volume =.6*game.settings.musicVolume;
                 this.scene.restart();           
             }
             if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
                 game.settings.playing = false;
                 this.bgm.stop();
-                game.settings.oozeSpeed = 0; //flag remove
-                //set ooze limit to 0
                 this.scene.start("menuScene");
             }
         } 
 
-        //moves void, but not past screen
-        if(this.void.y < game.config.height+100&&!this.gameoverBot)this.void.update(); //flag ooze limit
-        else  game.settings.oozeSpeed = 0;
+        //moves ooze, but not past screen
+        //if(this.ooze.y < game.config.height+100&&!this.gameoverBot)this.ooze.update(); //flag ooze limit
+        //else  game.settings.oozeSpeed = 0;
+
+        if (this.ooze.y > game.config.height+100) {
+            this.stopOoze();
+        }
+
+        this.ooze.update();
 
     }
 
@@ -412,6 +417,7 @@ class Play extends Phaser.Scene {
             player.hasBox = true;
             box.destroy();
         }
+        // cam note: do we want this? it looks buggy
         if ((player.y + player.height) < box.y) {
             player.isJump = false;
         }
@@ -424,6 +430,7 @@ class Play extends Phaser.Scene {
             //spawn full shelf sprite
             this.spawnFullShelf(shelf.x, shelf.y)
         }
+        // cam note: do we want this? it looks buggy
         if ((player.y + player.height) < shelf.y) {
             player.isJump = false;
         }
@@ -451,7 +458,7 @@ class Play extends Phaser.Scene {
         platform.setFrictionX(1);
 
         // 30% chance of spawning box / shelf
-        let objectChance = 30;
+        let objectChance = 100; //remember to make this 30 again
 
         let spawnRoll = Phaser.Math.RND.between(0, 100);
 
@@ -477,7 +484,7 @@ class Play extends Phaser.Scene {
                 
                 //update speed of existing platforms and objects
                 //code provided by Ben Rosien in the discord channel
-                {
+            
                 this.platforms.getChildren().forEach(function (platform) {
                     platform.body.velocity.y = this.scroll*this.platMod;
                 }, this);
@@ -493,19 +500,12 @@ class Play extends Phaser.Scene {
                 this.fullShelves.getChildren().forEach(function (fullShelf) {
                     fullShelf.body.velocity.y = this.scroll*this.platMod;
                 }, this);
-                }
-
-                game.settings.oozeSpeed = 0; //flag remove
-
-            } else if ((this.score%20 == 10) && (this.void.y < (game.config.height/4))) { //flag remove whole if statement
-        
-                game.settings.oozeSpeed = 0.05;
-        
+            
             }
     
         }
-    
     }
+
     spawnObject(x, y){
 
         //needs an order
@@ -578,6 +578,15 @@ class Play extends Phaser.Scene {
         shelf.body.checkCollision.right = false;
         shelf.body.checkCollision.down = false;
         shelf.setFrictionX(1);
+    }
+
+    oozeCreep() {
+        this.ooze.body.setVelocityY(game.settings.oozeSpeed);
+        let timer = this.time.delayedCall(game.settings.oozeDrop, this.stopOoze, [], this);
+    }
+
+    stopOoze() {
+        this.ooze.body.setVelocityY(0);
     }
 
 }

@@ -34,8 +34,10 @@ let config = {
 let game = new Phaser.Game(config);
 
 game.settings = {
-	// ooze settings
-	oozeSpeed: 0,
+	// speed ooze drops at
+	oozeSpeed: 50,
+	// time ooze drops for (ms)
+	oozeDrop: 1000,
 	tutorOpen: false,
 	playing: false,
 	bgm: null,
