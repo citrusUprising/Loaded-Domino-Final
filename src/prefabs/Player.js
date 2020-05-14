@@ -10,7 +10,7 @@ class Player extends Phaser.GameObjects.Sprite {
         this.scene = scene;
 
         this.speed = 300;
-        this.jumpHeight = -400;
+        this.jumpHeight = -450;
         this.hasBox = false;
 
         //this.speedUp = 400;

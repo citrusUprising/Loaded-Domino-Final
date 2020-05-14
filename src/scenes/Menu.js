@@ -84,7 +84,7 @@ class Menu extends Phaser.Scene {
         
         this.add.text (
             centerX, centerY, 
-            'Press (up) to start Tutorial', menuConfig
+            'Press ↑ to start Tutorial', menuConfig
         ).setOrigin(0.5);
 
         this.add.text (

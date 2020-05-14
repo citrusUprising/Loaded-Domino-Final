@@ -393,7 +393,7 @@ class Play extends Phaser.Scene {
                 if (agCustomer.y < this.ooze.y-agCustomer.height) {
                     agCustomer.destroy();
                     // creep ooze down
-                    this.oozeCreep();
+                    //this.oozeCreep(); //turn on if you want ooze to move when customer hits top of screen
                 }
             }, this);
 
@@ -543,7 +543,7 @@ class Play extends Phaser.Scene {
         if(player.hasBox&&Phaser.Input.Keyboard.JustDown(keyDOWN)){
             player.hasBox = false;
             player.isWork = true;
-            let timer = this.time.delayedCall(500, () => {
+            let timer = this.time.delayedCall(500, () => { //flag balance
                 player.isWork = false;
                 //spawn full shelf sprite
                 this.spawnFullShelf(shelf.x, shelf.y)
@@ -555,7 +555,7 @@ class Play extends Phaser.Scene {
     playerCleaning(player, mess){
         if(Phaser.Input.Keyboard.JustDown(keyDOWN)){
             player.isWork = true;
-            let timer = this.time.delayedCall(750, () => {
+            let timer = this.time.delayedCall(750, () => { //flag balance
                 player.isWork = false;
                 mess.destroy();
             }, null, this);
@@ -565,6 +565,8 @@ class Play extends Phaser.Scene {
     playerBumping(player, customer){
         this.spawnAngryCustomer(customer.x,customer.y);
         customer.destroy();
+        // creep ooze down
+        this.oozeCreep(); //turn on if you want ooze to move when customer is bumped
     }
 
     // spawn platform randomly at bottom of screen
@@ -589,7 +591,7 @@ class Play extends Phaser.Scene {
         platform.setFrictionX(1);
 
         // 30% chance of spawning box / shelf
-        let objectChance = 50; //remember to make this 30 again
+        let objectChance = 30; //remember to make this 30 again  //check
 
         let spawnRoll = Phaser.Math.RND.between(0, 100);
 
@@ -612,6 +614,9 @@ class Play extends Phaser.Scene {
                 
                 this.scroll += 0.2;
                 this.platformTimer.timeScale = 1 + (0.2*this.scroll);
+
+                //scales player jump to platform speed
+                this.player.jumpHeight -= 15; // 90 is = to this.scroll*jumpheight //flag may need balancing
                 
                 //update speed of existing platforms and objects
                 //code provided by Ben Rosien in the discord channel
@@ -652,13 +657,12 @@ class Play extends Phaser.Scene {
     spawnObject(x, y){
 
         //needs an order
-        let boxShelfChance = 3;
-        let messChance = 2;
-        let customerChance = 1;
+        let topBound = 67; //remember to set to 67 //check
+        let bottomBound = 34; //remember to set to 34 //check
 
-        let typeRoll = Phaser.Math.RND.between(1, 3);//change to 1, 3
+        let typeRoll = Phaser.Math.RND.between(1, 100);//change to 1, 3
 
-        if(boxShelfChance === typeRoll){//change to == once other methods implemented
+        if(typeRoll <= topBound && typeRoll >= bottomBound){
             if (!this.madeBox) {
                 this.spawnBox(x, y);
                 //console.log("A wild BOX appears!");
@@ -668,10 +672,10 @@ class Play extends Phaser.Scene {
                 //console.log("A wild SHELF appears!");
                 this.madeBox = false;
             }
-        } else if(messChance === typeRoll){
+        } else if(typeRoll >= topBound){
             this.spawnMess(x, y);
             //console.log("A wild MESS appears!");
-        }else if(customerChance === typeRoll){
+        }else if(typeRoll <= bottomBound){
             this.spawnCustomer(x, y);
             //console.log("A wild CUSTOMER appears!");
         }
