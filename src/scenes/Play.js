@@ -76,11 +76,25 @@ class Play extends Phaser.Scene {
 
         /*
         this.anims.create({
-			key: "playerWork",
+			key: "playerShelve",
 			frames: this.anims.generateFrameNames("sprites", {
 				prefix: "work",
 				start: 1,
-				end: 24,
+				end: 4,
+                zeroPad: 0
+			}),
+            frameRate: 60,
+            repeat: -1
+        });
+        */
+
+        /*
+        this.anims.create({
+			key: "playerClean",
+			frames: this.anims.generateFrameNames("sprites", {
+				prefix: "work",
+				start: 1,
+				end: 4,
                 zeroPad: 0
 			}),
             frameRate: 60,
@@ -93,7 +107,7 @@ class Play extends Phaser.Scene {
 			frames: this.anims.generateFrameNames("sprites", {
 				prefix: "mess",
 				start: 1,
-				end: 2,
+				end: 4,
                 zeroPad: 0
 			}),
             frameRate: 15, //flag
@@ -105,7 +119,7 @@ class Play extends Phaser.Scene {
 			frames: this.anims.generateFrameNames("sprites", {
 				prefix: "customer",
 				start: 1,
-				end: 14,
+				end: 11,
                 zeroPad: 0
 			}),
             frameRate: 20,//flag
