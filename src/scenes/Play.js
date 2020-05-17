@@ -52,21 +52,33 @@ class Play extends Phaser.Scene {
 			frames: this.anims.generateFrameNames("sprites", {
 				prefix: "run",
 				start: 1,
-				end: 24,
+				end: 10,
                 zeroPad: 0
 			}),
-            frameRate: 60,
+            frameRate: 30,
+            repeat: -1
+        });
+
+        this.anims.create({
+			key: "boxRun",
+			frames: this.anims.generateFrameNames("sprites", {
+				prefix: "boxRun",
+				start: 1,
+				end: 10,
+                zeroPad: 0
+			}),
+            frameRate: 30,
             repeat: -1
         });
 
         this.anims.create({
 			key: "playerIdle",
-			frames: this.anims.generateFrameNames("sprites", {
-				prefix: "run",
-				start: 1,
-				end: 1,
-                zeroPad: 0
-			}),
+			frames: [{ key: "sprites", frame: "char" }]
+        });
+
+        this.anims.create({
+			key: "boxIdle",
+			frames: [{ key: "sprites", frame: "char" }]//flag change to box idle
         });
         
         this.anims.create({
@@ -74,35 +86,36 @@ class Play extends Phaser.Scene {
 			frames: [{ key: "sprites", frame: "jump" }]
         });
 
-        /*
+        this.anims.create({
+			key: "boxAir",
+			frames: [{ key: "sprites", frame: "jumpbox" }]
+        });
+        
         this.anims.create({
 			key: "playerShelve",
 			frames: this.anims.generateFrameNames("sprites", {
-				prefix: "work",
+				prefix: "shelving",
 				start: 1,
 				end: 4,
                 zeroPad: 0
 			}),
-            frameRate: 60,
+            frameRate: 30,
             repeat: -1
         });
-        */
-
-        /*
+        
         this.anims.create({
 			key: "playerClean",
-			frames: this.anims.generateFrameNames("sprites", {
-				prefix: "work",
+			frames: this.anims.generateFrameNames("sprites", {//flag error animation only plays initial frame, causes player to slightly sink
+				prefix: "clean",
 				start: 1,
 				end: 4,
                 zeroPad: 0
 			}),
-            frameRate: 60,
+            frameRate: 30,
             repeat: -1
         });
-        */
 
-        this.anims.create({
+        this.anims.create({//flag error animation only plays initial frame
 			key: "smell",
 			frames: this.anims.generateFrameNames("sprites", {
 				prefix: "mess",
@@ -110,7 +123,7 @@ class Play extends Phaser.Scene {
 				end: 4,
                 zeroPad: 0
 			}),
-            frameRate: 15, //flag
+            frameRate: 30, //flag
             repeat: -1
         });
 
@@ -272,7 +285,7 @@ class Play extends Phaser.Scene {
         this.physics.world.setBounds(0, -100, game.config.width, game.config.height+200);
 
 		// add player with physics
-		this.player = new Player(this, game.config.width/2, 150, "sprites", "run1").setOrigin(0.5);
+		this.player = new Player(this, game.config.width/2, 150, "sprites", "char").setOrigin(0.5);
         this.physics.add.existing(this.player);
 
         // set player body size, 10 pixel gap on left + right
@@ -364,8 +377,11 @@ class Play extends Phaser.Scene {
             this.background.tilePositionY += this.scroll*delta*2/33;
  
             // update player
+            console.log('before update: '+this.player.isJump);
             this.player.update();
+            console.log('mid update: '+this.player.isJump);
             this.player.isJump = true;
+            console.log('after update: '+this.player.isJump);
 
             // destroy off-screen platforms 
             this.platforms.children.each(function(platform) {
@@ -540,10 +556,9 @@ class Play extends Phaser.Scene {
     playerHitPlatform(player, platform) {
 
         // make sure player is on top of platform
-        if ((player.y + player.height) < platform.y) {
+        if ((player.y + player.height/2 -1) < platform.y) {
             player.isJump = false;
         }
-
     }
 
     playerGrabBox(player, box) {//will not work if player is moving (bug or feature?)
@@ -556,9 +571,9 @@ class Play extends Phaser.Scene {
     playerShelving(player, shelf) {//will not work if player is moving (bug or feature?)
         if(player.hasBox&&Phaser.Input.Keyboard.JustDown(keyDOWN)){
             player.hasBox = false;
-            player.isWork = true;
+            player.isShelve = true;
             let timer = this.time.delayedCall(500, () => { //flag balance
-                player.isWork = false;
+                player.isShelve = false;
                 //spawn full shelf sprite
                 this.spawnFullShelf(shelf.x, shelf.y)
                 shelf.destroy();
@@ -568,9 +583,9 @@ class Play extends Phaser.Scene {
 
     playerCleaning(player, mess){
         if(Phaser.Input.Keyboard.JustDown(keyDOWN)){
-            player.isWork = true;
+            player.isMop = true;
             let timer = this.time.delayedCall(750, () => { //flag balance
-                player.isWork = false;
+                player.isMop = false;
                 mess.destroy();
             }, null, this);
         }

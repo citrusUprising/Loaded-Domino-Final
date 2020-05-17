@@ -19,7 +19,8 @@ class Player extends Phaser.GameObjects.Sprite {
         this.isJump = true; 
         this.isTurn = false;
         this.isRight = true;
-        this.isWork = false;
+        this.isShelve = false;
+        this.isMop = false;
 
     }
 
@@ -37,7 +38,7 @@ class Player extends Phaser.GameObjects.Sprite {
         }
 
         //limit speed if carrying a box
-        if(this.isWork)this.speed = 0;
+        if(this.isShelve||this.isMop)this.speed = 0;
         else if(this.hasBox)this.speed = 250;
         else this.speed = 300;
 
@@ -49,16 +50,17 @@ class Player extends Phaser.GameObjects.Sprite {
             this.body.velocity.x = -this.maxSpeed;
         }
         */
-       if(this.isWork)this.anims.play("playerIdle");//flag change to working animation
+       if(this.isShelve)this.anims.play("playerShelve");
+       else if(this.isMop)this.anims.play("playerClean");
        else{
             if (this.isJump) {
-                if(this.hasBox)this.anims.play("playerAir", true);//flag change to box jump sprite
+                if(this.hasBox)this.anims.play("boxAir", true);
                 else this.anims.play("playerAir", true);
             } else if(keyLEFT.isDown || keyRIGHT.isDown){
-                if(this.hasBox)this.anims.play("playerRun", true);//flag change to box run sprite
-                else this.anims.play("playerRun", true);
+                if(this.hasBox)this.anims.play("boxRun", true);
+                else this.anims.play("playerRun", true); //flag error, rapidly switches between run and jump
             }else{
-                if(this.hasBox)this.anims.play("playerIdle");//flag change to box idle sprite
+                if(this.hasBox)this.anims.play("boxIdle");
                 else this.anims.play("playerIdle");
             }
         }
@@ -92,7 +94,7 @@ class Player extends Phaser.GameObjects.Sprite {
         }
 
         // jump!
-        if (!this.isJump && !this.isWork && Phaser.Input.Keyboard.JustDown(keySPACE)) {
+        if (!this.isJump && !this.isShelve && !this.isMop && Phaser.Input.Keyboard.JustDown(keySPACE)) {
             this.body.velocity.y = this.jumpHeight;
             this.isJump = true;
             this.scene.sound.play("sfxJump", {volume: 0.4*game.settings.effectVolume});
