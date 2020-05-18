@@ -154,7 +154,7 @@ class Play extends Phaser.Scene {
 
         this.anims.create({
 			key: "boxIdle",
-			frames: [{ key: "sprites", frame: "charBox" }]
+			frames: [{ key: "sprites", frame: "charBox2" }]
         });
         
         this.anims.create({
@@ -191,7 +191,7 @@ class Play extends Phaser.Scene {
             repeat: -1
         });
 
-        this.anims.create({ //flag error animation only plays initial frame
+        this.anims.create({ 
 			key: "smell",
 			frames: this.anims.generateFrameNames("sprites", {
 				prefix: "mess",
@@ -211,7 +211,7 @@ class Play extends Phaser.Scene {
 				end: 11,
                 zeroPad: 0
 			}),
-            frameRate: 20,//flag
+            frameRate: 20,
             repeat: 0
         }); 
 
@@ -763,8 +763,8 @@ class Play extends Phaser.Scene {
     spawnObject(x, y) {
 
         //needs an order
-        let topBound = 67;
-        let bottomBound = 34;
+        let topBound = 67; //check set to 67
+        let bottomBound = 34; //check set to 34
 
         let typeRoll = Phaser.Math.RND.between(1, 100); //change to 1, 3
 

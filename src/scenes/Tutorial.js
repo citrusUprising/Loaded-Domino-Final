@@ -5,10 +5,36 @@ class Tutorial extends Phaser.Scene {
     }
 
     preload() {
+        // load sprite atlas
+        this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
 
     }
 
     create() {
+
+        this.anims.create({ 
+			key: "smell",
+			frames: this.anims.generateFrameNames("sprites", {
+				prefix: "mess",
+				start: 1,
+				end: 4,
+                zeroPad: 0
+			}),
+            frameRate: 30, //flag
+            repeat: -1
+        });
+
+        this.anims.create({
+			key: "customerBump",
+			frames: this.anims.generateFrameNames("sprites", {
+				prefix: "customerMad",
+				start: 1,
+				end: 11,
+                zeroPad: 0
+			}),
+            frameRate: 14,
+            repeat: -1
+        }); 
 
         this.comeplete = false;
 
@@ -30,34 +56,58 @@ class Tutorial extends Phaser.Scene {
         let textSpacer = 60;
 
         this.add.text (
-            centerX, centerY-2*textSpacer, 
+            centerX, centerY-5*textSpacer, 
             'Keep your job while surviving a panic attack!', menuConfig
         ).setOrigin(0.5);
         
         this.add.text (
-            centerX, centerY-textSpacer, 
+            centerX, centerY-4*textSpacer, 
             'Descend the shelves using ← and → to move', menuConfig
         ).setOrigin(0.5);
 
         this.add.text (
-            centerX, centerY, 
-            'and Space to jump!', menuConfig
+            centerX, centerY-3*textSpacer, 
+            '[Z] to jump, and [X] to interact', menuConfig
         ).setOrigin(0.5);
+
+        this.add.text (
+            centerX*3/4, centerY-textSpacer, 
+            'Bring Boxes to Shelves', menuConfig
+        ).setOrigin(0.5);
+
+        this.box = this.add.sprite((centerX*5/4)-50, centerY-textSpacer, 'sprites', 'Box').setOrigin(.5);
+        this.shelf = this.add.sprite((centerX*5/4)+50, centerY-textSpacer, 'sprites', 'ShelfEmpty').setOrigin(.5,.75);
+
+        this.add.text (
+            centerX*3/4, centerY, 
+            'Clean up messes', menuConfig
+        ).setOrigin(0.5);
+
+        this.mess = this.add.sprite(centerX*5/4, centerY, 'sprites', 'mess1').setOrigin(.5);
+        this.mess.anims.play('smell');
+
+        this.add.text (
+            centerX*3/4, centerY+textSpacer, 
+            'Avoid bumping into customers', menuConfig
+        ).setOrigin(0.5);
+
+        this.customer = this.add.sprite(centerX*5/4, centerY+textSpacer, 'sprites', 'customerIdle').setOrigin(.5);
+        this.customer.anims.play('customerBump');
         
         this.add.text (
-            centerX, centerY+textSpacer, 
+            centerX, centerY+3*textSpacer, 
             'Be careful not to fall off the shelves', menuConfig
         ).setOrigin(0.5);
         
         this.add.text (
-            centerX, centerY+2*textSpacer, 
+            centerX, centerY+4*textSpacer, 
             'or be consumed by your own existential dread.', menuConfig
         ).setOrigin(0.5);
 
         menuConfig.color = '#de7183';
 
         this.add.text (
-            centerX, centerY+3*textSpacer, 
+            centerX, centerY+5*textSpacer, 
             '← Menu   → Start Shift', menuConfig
         ).setOrigin(0.5);
 
