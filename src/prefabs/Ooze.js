@@ -6,6 +6,6 @@ class Ooze extends Phaser.GameObjects.Sprite {
     }
 
     update() {
-        this.anims.play("voider", true);
+        this.anims.play("voidAnim", true);
     }
 }

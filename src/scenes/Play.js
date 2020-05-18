@@ -10,43 +10,119 @@ class Play extends Phaser.Scene {
 		//this.load.image("player", "assets/char.png");
         //this.load.image("platform", "assets/rampsmall.png");
         this.load.image("backDrop", "assets/ware.png");
-        this.load.image("void", "assets/void.png");
+        this.load.image("voidStatic", "assets/voidStatic.png");
 
         // load sprite atlas
         this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
 
         // load void spritesheet
-        this.load.spritesheet("void1", "assets/void1.png", {
-            frameWidth: 960, frameHeight :1050,
+        this.load.spritesheet("void", "assets/void.png", {
+            frameWidth: 1280, frameHeight :867,
             startFrame: 0, endFrame: 29
         });
+        
     }
 
-    create(){
+    create() {
+
+        /**********************
+         *  set up constants  *
+         **********************/
+
+        this.BG_DEPTH= -999;
+        this.PLATFORM_DEPTH = -998;
+        this.BOX_DEPTH = -996;
+        this.SHELF_DEPTH = -997;
+        this.MESS_DEPTH = -997;
+        this.CUSTOMER_DEPTH = -997;
+
+        /**********************
+         *  set up variables  *
+         **********************/
+
+        this.score = 0;   
 
         //speed of scrolling
         this.scroll = 1;
 
-        //mltiplier applied to platform scrolling speed, otherwise platforms go down and are WAY slower than the background
-        this.platMod = -80; //flag (-60 @ 540p)   
-        
-        // create warehouse backdrop
-        this.background = this.add.tileSprite(0, 0, 960, 540, "backDrop").setOrigin(0,0).setScale(4/3); //flag remove set scale on asset change
-        this.background.setDepth(-999);
-        //this.physics.add.existing(this.background);
-        //this.background.body.allowGravity = false;
-       // this.background.body.immovable = true;
-        //this.background.body.checkCollision.none = true;
-        //this.background.body.setVelocityY(this.scroll*this.platMod);
+        // multiplier applied to platform scrolling speed
+        this.platMod = -80;  
 
+        // boolean that determines whether a box or shelf comes next
+        this.madeBox = false;
+
+        //platform generation
+        this.xL = 0;
+        this.xR = game.config.width;
+
+        //separate gameover variables depending on death
+        this.gameoverTop = false;
+        this.gameoverBot = false;
+
+        /****************
+         * text configs *
+         ****************/
+
+        this.scoreBoardConfig = {
+            fontFamily: 'Helvetica',
+            fontSize: '30px',
+            backgroundColor: '#000000',
+            color: '#facade',
+            align: 'center',
+            padding: {
+                top: 10,
+                bottom: 10,
+            },
+            fixedWidth: 100
+        }
+
+        this.gameOverHeaderConfig = {
+            fontFamily: 'Helvetica',
+            fontSize: '50px',
+            color: '#e81e40',
+            align: 'center',
+            padding: {
+                top: 10,
+                bottom: 10,
+            },
+            fixedWidth: 0
+        }
+
+        this.gameOverInfoConfig = {
+            fontFamily: 'Helvetica',
+            fontSize: '30px',
+            color: '#facade',
+            align: 'center',
+            padding: {
+                top: 10,
+                bottom: 10,
+            },
+            fixedWidth: 0
+        }
+
+        this.gameOverInstructionsConfig = {
+            fontFamily: 'Helvetica',
+            fontSize: '30px',
+            color: '#facade',
+            align: 'center',
+            padding: {
+                top: 10,
+                bottom: 10,
+            },
+            fixedWidth: 0
+        }
+
+        /*********************
+         * create animations *
+         *********************/
+        
         this.anims.create({
-            key: 'voider',
+            key: "voidAnim",
             repeat: -1,
-            frames: this.anims.generateFrameNumbers('void1', { start: 0, end: 29, first: 0}),
-            frameRate: 25
+            frames: this.anims.generateFrameNumbers("void", { start: 0, end: 29, first: 0}),
+            frameRate: 30
         });
         
-		// create animations
 		this.anims.create({
 			key: "playerRun",
 			frames: this.anims.generateFrameNames("sprites", {
@@ -99,23 +175,23 @@ class Play extends Phaser.Scene {
 				end: 4,
                 zeroPad: 0
 			}),
-            frameRate: 30,
+            frameRate: 10,
             repeat: -1
         });
         
         this.anims.create({
 			key: "playerClean",
-			frames: this.anims.generateFrameNames("sprites", {//flag error animation only plays initial frame, causes player to slightly sink
+			frames: this.anims.generateFrameNames("sprites", { //flag error animation only plays initial frame, causes player to slightly sink
 				prefix: "clean",
 				start: 1,
 				end: 4,
                 zeroPad: 0
 			}),
-            frameRate: 30,
+            frameRate: 10,
             repeat: -1
         });
 
-        this.anims.create({//flag error animation only plays initial frame
+        this.anims.create({ //flag error animation only plays initial frame
 			key: "smell",
 			frames: this.anims.generateFrameNames("sprites", {
 				prefix: "mess",
@@ -137,143 +213,21 @@ class Play extends Phaser.Scene {
 			}),
             frameRate: 20,//flag
             repeat: 0
-        });  
+        }); 
 
-        //sets up music
-        let musicPlayConfig = {
-            mute: false,
-            volume: .6*game.settings.musicVolume,
-            loop: true
-        }
-
-        musicPlayConfig.volume = .6*game.settings.musicVolume;
-
-        if (!game.settings.playing) {
-            this.bgm = this.sound.add('gameMusic', musicPlayConfig);
-            this.bgm.play();
-        }
-        game.settings.playing = true;
+        /*****************
+         * set up timers *
+         *****************/
         
-        this.score = 0;   
-
-        // boolean that determines whether a box or shelf comes next
-        this.madeBox = false;
-
-        //platform generation
-        this.xL = 0;
-        this.xR = game.config.width;
-        
+        // speed timer
         this.speedTimer = this.time.addEvent ({
             delay: 1000,
-            callback: this.scoreUp/*(this.score, this.speed)*/,
+            callback: this.scoreUp /*(this.score, this.speed)*/,
             callbackScope: this,
             loop: true
         });
 
-		// group for platform collisions
-        this.platforms = this.physics.add.group(); //shift to platform class??
-
-        //group for box collisions
-        this.boxes = this.physics.add.group();
-
-        //group for shelf collisions
-        this.shelves = this.physics.add.group();
-
-        //group for full shelf existance
-        this.fullShelves = this.physics.add.group();
-
-        //group for mess collisions
-        this.messes = this.physics.add.group();
-
-        //group for customer collisions
-        this.customers = this.physics.add.group();
-
-        //group for angry customers
-        this.agCustomers = this.physics.add.group();
-        
-        // starting platform
-		this.platforms.create(game.config.width/2, game.config.height+50, "sprites", "rampsmall").setScale(1);
-		
-		// iterate through platforms group, set variables
-		this.platforms.children.each(function(platform) {
-			platform.body.allowGravity = false;
-            platform.body.immovable = true;
-            platform.body.velocity.y = this.platMod*this.scroll;
-            platform.body.checkCollision.left = false;
-            platform.body.checkCollision.right = false;
-            platform.body.checkCollision.down = false;
-            platform.setFrictionX(1);
-        }, this);
-        
-        // iterate through boxes group, set variables
-		this.boxes.children.each(function(box) {
-			box.body.allowGravity = false;
-            box.body.immovable = true;
-            box.body.velocity.y = this.platMod*this.scroll;
-            box.body.checkCollision.up = false;
-            box.body.checkCollision.left = false;
-            box.body.checkCollision.right = false;
-            box.body.checkCollision.down = false;
-            box.setFrictionX(1);
-        }, this);
-        
-        // iterate through shelves group, set variables
-		this.shelves.children.each(function(shelf) {
-			shelf.body.allowGravity = false;
-            shelf.body.immovable = true;
-            shelf.body.velocity.y = this.platMod*this.scroll;
-            shelf.body.checkCollision.up = false;
-            shelf.body.checkCollision.left = false;
-            shelf.body.checkCollision.right = false;
-            shelf.body.checkCollision.down = false;
-            shelf.setFrictionX(1);
-        }, this);
-
-        // iterate through full shelves group, set variables
-            this.fullShelves.children.each(function(fullShelf) {
-			fullShelf.body.allowGravity = false;
-            fullShelf.body.immovable = true;
-            fullShelf.body.velocity.y = this.platMod*this.scroll;
-            fullShelf.body.checkCollision.up = false;
-            fullShelf.body.checkCollision.left = false;
-            fullShelf.body.checkCollision.right = false;
-            fullShelf.body.checkCollision.down = false;
-            fullShelf.setFrictionX(1);
-        }, this);
-        
-        //iterate throuhg messes group, set variables
-        this.messes.children.each(function(mess) {
-			mess.body.allowGravity = false;
-            mess.body.immovable = true;
-            mess.body.velocity.y = this.platMod*this.scroll;
-            mess.body.checkCollision.up = false;
-            mess.body.checkCollision.left = false;
-            mess.body.checkCollision.right = false;
-            mess.body.checkCollision.down = false;
-            mess.setFrictionX(1);
-        }, this);
-
-        //iterate throuhg customer group, set variables
-        this.customers.children.each(function(customer) {
-			customer.body.allowGravity = false;
-            customer.body.immovable = true;
-            customer.body.velocity.y = this.platMod*this.scroll;
-            customer.setFrictionX(1);
-        }, this);
-
-        //iterate throuhg angry customer group, set variables
-        this.agCustomers.children.each(function(agCustomer) {
-			agCustomer.body.allowGravity = false;
-            agCustomer.body.immovable = true;
-            agCustomer.body.velocity.y = this.platMod*this.scroll;
-            agCustomer.body.checkCollision.up = false;
-            agCustomer.body.checkCollision.left = false;
-            agCustomer.body.checkCollision.right = false;
-            agCustomer.body.checkCollision.down = false;
-            agCustomer.setFrictionX(1);
-        }, this);
-
-        // add timer for spawning platforms (possibly temporary method?)
+        // timer for spawning platforms (possibly temporary method?)
         this.platformTimer = this.time.addEvent ({
             delay: 3000, 
             callback: this.makePlatform,
@@ -281,58 +235,114 @@ class Play extends Phaser.Scene {
             loop: true
         });
 
-        //sets world bounds with vertical pockets for game over
+        // timer for cleaning up things
+        this.cleanUpTimer = this.time.addEvent ({
+            delay: 250,
+            callback: this.cleanUp,
+            callbackScope: this,
+            loop: true
+        })
+
+        /**********************************************************
+         * setup world bounds with vertical pockets for game over *
+         **********************************************************/
+
         this.physics.world.setBounds(0, -100, game.config.width, game.config.height+200);
 
-		// add player with physics
+        /**************************
+         * add warehouse backdrop *
+         **************************/
+
+        this.background = this.add.tileSprite(0, 0, 1280, 720, "backDrop").setOrigin(0,0);
+        this.background.setDepth(this.BG_DEPTH);
+
+        /**************
+         * add player *
+         **************/
+
 		this.player = new Player(this, game.config.width/2, 150, "sprites", "char").setOrigin(0.5);
         this.physics.add.existing(this.player);
 
-        // set player body size, 10 pixel gap on left + right
-        this.player.body.setSize(60, 60, 10, 0);
-
+        // setup player physics
 		this.player.body.bounce.x = 0.0;
         this.player.body.bounce.y = 0.0;
         this.player.body.collideWorldBounds = true; 
 
-		// add collisions
+        // set player body size, 10 pixel gap on left + right
+        this.player.body.setSize(40, 70);
+        this.player.body.setOffset(5, 10);
+
+        /************
+         * add ooze *
+         ************/
+
+        this.ooze = new Ooze(this, 0, 0, "voidStatic", 0).setOrigin(0, 1);
+        this.physics.add.existing(this.ooze);
+        this.ooze.body.allowGravity = false;
+        this.ooze.body.immovable = true;
+
+        /******************
+         * add scoreboard *
+         ******************/
+
+        this.scoreBoard = this.add.text(0, 0, this.score, this.scoreBoardConfig);
+
+        /***************
+         * start music *
+         ***************/
+
+        let musicPlayConfig = {
+            mute: false,
+            volume: 0.6*game.settings.musicVolume,
+            loop: true
+        }
+        //musicPlayConfig.volume = 0.6*game.settings.musicVolume;
+
+        if (!game.settings.playing) {
+            this.bgm = this.sound.add('gameMusic', musicPlayConfig);
+            this.bgm.play();
+        }
+
+        game.settings.playing = true;
+
+        /********************
+         * collision groups *
+         ********************/
+
+        this.platforms = this.physics.add.group();
+        this.boxes = this.physics.add.group();
+        this.shelves = this.physics.add.group();
+        this.fullShelves = this.physics.add.group();
+        this.messes = this.physics.add.group();
+        this.customers = this.physics.add.group();
+        this.agCustomers = this.physics.add.group();
+
         this.physics.add.collider(this.player, this.platforms, this.playerHitPlatform, null, this);
         this.physics.add.collider(this.player, this.boxes, this.playerGrabBox, null, this);
         this.physics.add.collider(this.player, this.shelves, this.playerShelving, null, this);
         this.physics.add.collider(this.player, this.messes, this.playerCleaning, null, this);
         this.physics.add.collider(this.player, this.customers, this.playerBumping, null, this);
 
-        //separate gameover variables depending on death
-        this.gameoverTop = false;
-        this.gameoverBot = false;
+        /**************************
+         * make starting platform *
+         **************************/
 
-        // ooze creation
-        this.ooze = new Ooze(this, 0, 0, 'void', 0).setOrigin(0, 1).setScale(4/3); //flag remove set scale on asset change
-        this.physics.add.existing(this.ooze);
-        this.ooze.body.allowGravity = false;
-        this.ooze.body.immovable = true;
+        let plat = this.platforms.create(game.config.width/2, game.config.height+50, "sprites", "rampsmall");
+    	plat.body.allowGravity = false;
+        plat.body.immovable = true;
+        plat.body.velocity.y = this.platMod*this.scroll;
+        plat.body.checkCollision.left = false;
+        plat.body.checkCollision.right = false;
+        plat.body.checkCollision.down = false;
+        plat.setFrictionX(1);
+        plat.setDepth(this.PLATFORM_DEPTH);
 
-        let menuConfig = {
-            fontFamily: 'Helvetica',
-            fontSize: '30px',
-            backgroundColor: '#000000',
-            color: '#facade',
-            align: 'center',
-            padding: {
-                top: 10,
-                bottom: 10,
-            },
-            fixedWidth: 100
-        }
+        /***************
+         * assign keys *
+         **************/
 
-        let centerX = game.config.width/2;
-        let centerY = game.config.height/2;
-        let textSpacer = 80;
-
-        this.scoreBoard = this.add.text(0, 0, this.score, menuConfig);
-
-        // assign keys
-        keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        keyJUMP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z);
+        keyINTERACT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
@@ -341,35 +351,7 @@ class Play extends Phaser.Scene {
     }
 
     update(time, delta) {
-
-        this.platforms.children.each(function(platform) {
-            platform.setDepth(-998);
-        }, this);
-
-        this.boxes.children.each(function(box) {
-            box.setDepth(-996);
-        }, this);
-
-        this.shelves.children.each(function(shelf) {
-            shelf.setDepth(-997);
-        }, this);
-
-        this.fullShelves.children.each(function(fullShelf) {
-            fullShelf.setDepth(-997);
-        }, this);
-
-        this.messes.children.each(function(mess) {
-            mess.setDepth(-997);
-        }, this);
-
-        this.customers.children.each(function(customer) {
-            customer.setDepth(-997);
-        }, this);
-
-        this.agCustomers.children.each(function(agCustomer) {
-            agCustomer.setDepth(-997);
-        }, this);
-        
+       
         // if player hasn't died yet
         if (!this.gameoverTop && !this.gameoverBot) {
  
@@ -377,55 +359,22 @@ class Play extends Phaser.Scene {
             this.background.tilePositionY += this.scroll*delta*2/33;
  
             // update player
+            
+            // cam note: ive commented this out for now 2 work on speed
+            /*
             console.log('before update: '+this.player.isJump);
             this.player.update();
             console.log('mid update: '+this.player.isJump);
             this.player.isJump = true;
             console.log('after update: '+this.player.isJump);
+            */
 
-            // destroy off-screen platforms 
-            this.platforms.children.each(function(platform) {
-                if (platform.y < -platform.height) {
-                    platform.destroy();
-                }
-            }, this);
+            // update player
+            this.player.update();
+            this.player.isJump = true;
 
-            //destroy boxes and shelves
-            this.boxes.children.each(function(box) {
-                if (box.y < this.ooze.y-box.height) {
-                    box.destroy();
-                }
-            }, this);
-
-            this.shelves.children.each(function(shelf) {
-                if (shelf.y < this.ooze.y-shelf.height) {
-                    shelf.destroy();
-                    // creep ooze down
-                    this.oozeCreep();
-                }
-            }, this);
-
-            this.messes.children.each(function(mess) {
-                if (mess.y < this.ooze.y-mess.height) {
-                    mess.destroy();
-                    // creep ooze down
-                    this.oozeCreep();
-                }
-            }, this);
-
-            this.customers.children.each(function(customer) {
-                if (customer.y < this.ooze.y-customer.height) {
-                    customer.destroy();
-                }
-            }, this);
-
-            this.agCustomers.children.each(function(agCustomer) {
-                if (agCustomer.y < this.ooze.y-agCustomer.height) {
-                    agCustomer.destroy();
-                    // creep ooze down
-                    //this.oozeCreep(); //turn on if you want ooze to move when customer hits top of screen
-                }
-            }, this);
+            // update ooze
+            this.ooze.update();
 
             //flip sprite when player turns
             if (this.player.isTurn) { 
@@ -437,214 +386,230 @@ class Play extends Phaser.Scene {
             // check if player died
             // give player some leeway so they don't get eaten by particles
             if (this.player.y < this.ooze.y-80) {
-
-                //console.log("game over, eaten by ooze");
-                this.finScore = this.score;
                 this.gameoverTop = true;
-                this.ooze.body.setVelocityY(game.settings.oozeSpeed*10);
-                this.sound.play("sfxConsume", {volume: 0.4*game.settings.effectVolume});
-
             } else if (this.player.y > game.config.height+50) {
-
-                //console.log("game over, fell off screen");
-                this.finScore = this.score;
                 this.gameoverBot = true;
-                this.sound.play("sfxFall", {volume: 0.4*game.settings.effectVolume});
-
             }
 
-            this.scoreBoard.setText(this.score);
+            // if player *just* died, perform,, the rituals
+            if (this.gameoverTop || this.gameoverBot) {
+
+                // turn off player movement
+                this.player.body.velocity.x = 0;
+                this.player.body.velocity.y = 0;
+                this.player.body.bounce.x = 0;
+                this.player.body.bounce.y = 0;
+                this.player.body.allowGravity = false;
+
+                // stop *everything*
+                this.platformTimer.paused = true;
+
+                this.platforms.children.each(function(platform) {
+                    platform.body.velocity.y = 0;
+                }, this);
+
+                this.boxes.children.each(function(box) {
+                    box.body.velocity.y = 0;
+                }, this);
+
+                this.shelves.children.each(function(shelf) {
+                    shelf.body.velocity.y = 0;
+                }, this);
+
+                this.fullShelves.children.each(function(fullShelf) {
+                    fullShelf.body.velocity.y = 0;
+                }, this);
+
+                this.messes.children.each(function(mess) {
+                    mess.body.velocity.y = 0;
+                }, this);
+
+                this.customers.children.each(function(customer) {
+                    customer.body.velocity.y = 0;
+                }, this);
+
+                this.agCustomers.children.each(function(agCustomer) {
+                    agCustomer.body.velocity.y = 0;
+                }, this);
+
+                // hide scoreboard
+                this.scoreBoard.setVisible(false);
+
+                // final score
+                this.finScore = this.score;
+
+                // quiet bgm
+                this.bgm.volume = 0.2*game.settings.musicVolume;
+
+                // text spacer for game over text
+                let textSpacer = 60;
+
+                // create game over text
+                // note 2 cam from cam: clean this up, remove magic #s -love, cam
+                this.add.rectangle (
+                    game.config.width/2, game.config.height/2,
+                    500, 360, 0x000000
+                ).setOrigin(0.5);
+                
+                this.add.text (
+                    game.config.width/2, (game.config.height/2)-(2*textSpacer),
+                    "Game Over", this.gameOverHeaderConfig
+                ).setOrigin(0.5);
+                
+                this.add.text (
+                    game.config.width/2, game.config.height/2,
+                    "after only " + this.finScore + " seconds at work",
+                    this.gameOverInfoConfig
+                ).setOrigin(0.5);
+
+                this.add.text (
+                    game.config.width/2, game.config.height/2+textSpacer,
+                    "Press ↑ to try again", this.gameOverInstructionsConfig
+                ).setOrigin(0.5);
+
+                this.add.text (
+                    game.config.width/2, game.config.height/2+2*textSpacer,
+                    "Press ↓ to return to menu", this.gameOverInstructionsConfig
+                ).setOrigin(0.5);
+    
+                if (this.gameoverTop) {
+
+                    this.add.text (
+                        game.config.width/2, game.config.height/2-textSpacer,
+                        'You were consumed by the void', this.gameOverInfoConfig
+                    ).setOrigin(0.5);
+
+                    // cover screen with ooze
+                    this.ooze.body.setVelocityY(game.settings.oozeSpeed*10);
+                
+                    // om nom nom ( ิ౪ ิ)っ─∈
+                    this.sound.play("sfxConsume", {volume: 0.4*game.settings.effectVolume});
+                    
+                } else if (this.gameoverBot) {
+
+                    this.add.text (
+                        game.config.width/2, game.config.height/2-textSpacer,
+                        'You fell to your death', this.gameOverInfoConfig
+                    ).setOrigin(0.5);
+
+                    // aaaaaaaaaaaaaaaaaa
+                    this.sound.play("sfxFall", {volume: 0.4*game.settings.effectVolume});
+                
+                }
+                
+            }
     
         // else, if player's dead
         } else {
 
-            this.bgm.volume =.2*game.settings.musicVolume;
-
-            // game over!
-            //this.menuConfig.fixedWidth = 0;
-
-            let GOConfig = {
-                fontFamily: 'Helvetica',
-                fontSize: '50px',
-                color: '#e81e40',
-                align: 'center',
-                padding: {
-                    top: 10,
-                    bottom: 10,
-                },
-                fixedWidth: 0
-            }
-            let textSpacer = 60;
-
-            this.scoreBoard.setVisible(false);
-
-            //Game Over stats
-            this.add.rectangle(game.config.width/2, game.config.height/2, 500, 360, 0x000000).setOrigin(.5);
-            this.add.text (game.config.width/2, game.config.height/2-2*textSpacer, 'Game Over', GOConfig).setOrigin(0.5);
-            GOConfig.fontSize = '30px';
-            GOConfig.color = '#facade';
-            if(this.gameoverTop)this.add.text (game.config.width/2, game.config.height/2-textSpacer, 'You succumbed to anxiety', GOConfig).setOrigin(0.5);
-            else if (this.gameoverBot)this.add.text (game.config.width/2, game.config.height/2-textSpacer, 'You fell to your death', GOConfig).setOrigin(0.5);
-            this.add.text (game.config.width/2, game.config.height/2, 'You worked for a total of '+this.finScore+' seconds', GOConfig).setOrigin(0.5);
-            GOConfig.color = '#de7183';
-            this.add.text (game.config.width/2, game.config.height/2+textSpacer, 'Press ↑ to try again', GOConfig).setOrigin(0.5);
-            this.add.text (game.config.width/2, game.config.height/2+2*textSpacer, 'Press ↓ to return to menu', GOConfig).setOrigin(0.5);
-
-            // turn off player movement
-            this.player.body.velocity.x = 0;
-		    this.player.body.velocity.y = 0;
-		    this.player.body.bounce.x = 0;
-            this.player.body.bounce.y = 0;
-            this.player.body.allowGravity = false;
-
-            // stop platforms
-            this.platformTimer.paused = true;
-
-            this.platforms.children.each(function(platform) {
-                platform.body.velocity.y = 0;
-            }, this);
-
-            this.boxes.children.each(function(box) {
-                box.body.velocity.y = 0;
-            }, this);
-
-            this.shelves.children.each(function(shelf) {
-                shelf.body.velocity.y = 0;
-            }, this);
-
-            this.fullShelves.children.each(function(fullShelf) {
-                fullShelf.body.velocity.y = 0;
-            }, this);
-
-            this.messes.children.each(function(mess) {
-                mess.body.velocity.y = 0;
-            }, this);
-
-            this.customers.children.each(function(customer) {
-                customer.body.velocity.y = 0;
-            }, this);
-
-            this.agCustomers.children.each(function(agCustomer) {
-                agCustomer.body.velocity.y = 0;
-            }, this);
-
-            // reset scene
+            // reset scene on player input
             if (Phaser.Input.Keyboard.JustDown(keyUP)) {
                 this.bgm.volume =.6*game.settings.musicVolume;
                 this.scene.restart();           
             }
+
+            // exit to menu on player input
             if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
                 game.settings.playing = false;
                 this.bgm.stop();
                 this.scene.start("menuScene");
             }
+
         } 
 
-        //moves ooze, but not past screen
-        //if(this.ooze.y < game.config.height+100&&!this.gameoverBot)this.ooze.update(); //flag ooze limit
-        //else  game.settings.oozeSpeed = 0;
-
+        // prevent ooze from going off screen
         if (this.ooze.y > game.config.height+100) {
             this.stopOoze();
-        }
-
-        this.ooze.update();
+        }        
 
     }
 
-    // callback if player lands on platform
-    playerHitPlatform(player, platform) {
+    // cleanUp()
+    // removes off-screen objects
+    cleanUp() {
 
-        // make sure player is on top of platform
-        if ((player.y + player.height/2 -1) < platform.y) {
-            player.isJump = false;
-        }
-    }
+        // clean up platforms
+        this.platforms.children.each(function(platform) {
+            if (platform.y < -platform.height) {
+                platform.destroy();
+            }
+        }, this);
 
-    playerGrabBox(player, box) {//will not work if player is moving (bug or feature?)
-        if(!player.hasBox&&Phaser.Input.Keyboard.JustDown(keyDOWN)){
-            player.hasBox = true;
-            box.destroy();
-        }
-    }
+        // clean up boxes
+        this.boxes.children.each(function(box) {
+            if (box.y < this.ooze.y-box.height) {
+                box.destroy();
+            }
+        }, this);
 
-    playerShelving(player, shelf) {//will not work if player is moving (bug or feature?)
-        if(player.hasBox&&Phaser.Input.Keyboard.JustDown(keyDOWN)){
-            player.hasBox = false;
-            player.isShelve = true;
-            let timer = this.time.delayedCall(500, () => { //flag balance
-                player.isShelve = false;
-                //spawn full shelf sprite
-                this.spawnFullShelf(shelf.x, shelf.y)
+        // clean up shelves
+        this.shelves.children.each(function(shelf) {
+            if (shelf.y < this.ooze.y-shelf.height) {
                 shelf.destroy();
-            }, null, this);
-        }
-    }
+                // creep ooze down
+                if (!this.gameOverTop && !this.gameOverBot) {
+                    this.oozeCreep();
+                }
+            }
+        }, this);
 
-    playerCleaning(player, mess){
-        if(Phaser.Input.Keyboard.JustDown(keyDOWN)){
-            player.isMop = true;
-            let timer = this.time.delayedCall(750, () => { //flag balance
-                player.isMop = false;
+        // clean up full shelves
+        this.fullShelves.children.each(function(fullShelf) {
+            if (fullShelf.y < this.ooze.y-fullShelf.height) {
+                fullShelf.destroy();
+            }
+        }, this);
+
+        // clean up messes
+        this.messes.children.each(function(mess) {
+            if (mess.y < this.ooze.y-mess.height) {
                 mess.destroy();
-            }, null, this);
-        }
+                // creep ooze down
+                if (!this.gameOverTop && !this.gameOverBot) {
+                    this.oozeCreep();
+                }
+            }
+        }, this);
+
+        // clean up customers
+        this.customers.children.each(function(customer) {
+            if (customer.y < this.ooze.y-customer.height) {
+                customer.destroy();
+            }
+        }, this);
+
+        // clean up angry customers
+        this.agCustomers.children.each(function(agCustomer) {
+            if (agCustomer.y < this.ooze.y-agCustomer.height) {
+                if (!this.gameOverBot && !this.gameOverBot) {
+                    agCustomer.destroy();
+                }
+                //turn on if you want ooze to move when customer hits top of screen
+                //this.oozeCreep();
+            }
+        }, this);
+
     }
 
-    playerBumping(player, customer){
-        this.spawnAngryCustomer(customer.x,customer.y);
-        customer.destroy();
-        // creep ooze down
-        this.oozeCreep(); //turn on if you want ooze to move when customer is bumped
-    }
-
-    // spawn platform randomly at bottom of screen
-    makePlatform() {
-
-        let sx = Phaser.Math.RND.between(this.xL, this.xR);
-        this.xL = sx-(game.config.width*.5); //flag (*2/3) in 540p
-        if (this.xL < -25)this.xL = 0;
-        this.xR = sx+(game.config.width*.5); //flag (*2/3) in 540p
-        if (this.xR > game.config.width+25)this.xR = game.config.width;
-        //console.log(sx);
-
-        let platform = this.platforms.create(sx, game.config.height+100, "sprites", "rampsmall");
-
-        platform.setScale(1);
-        platform.body.allowGravity = false;
-        platform.body.immovable = true;
-        platform.body.velocity.y = this.platMod*this.scroll;
-        platform.body.checkCollision.left = false;
-        platform.body.checkCollision.right = false;
-        platform.body.checkCollision.down = false;
-        platform.setFrictionX(1);
-
-        // 30% chance of spawning box / shelf
-        let objectChance = 30; //remember to make this 30 again  //check
-
-        let spawnRoll = Phaser.Math.RND.between(0, 100);
-
-        // runs code to determine what object is spawned
-        if (spawnRoll <= objectChance) {
-            let xRandom = Phaser.Math.RND.between(sx-100, sx+100); // flag make sure number is <= (platform width-largest object width)/2
-            if (xRandom < 50) xRandom = 50;
-            if (xRandom > game.config.width-50) xRandom = game.config.width-50;
-            this.spawnObject(xRandom, game.config.height+100-(platform.height/2));
-        }
-    }
-
+    // scoreUp()
+    //  increase score every second
     scoreUp() {
         
         if (!this.gameOverBot && !this.gameOverTop) {
         
+            // increment score
             this.score++;
+
+            // update scoreBoard
+            this.scoreBoard.setText(this.score);
         
             if ((this.scroll < 2) && (this.score%20 == 0) && (this.score > 0)) {
                 
+                // make scrolling + spawning a little faster
                 this.scroll += 0.2;
                 this.platformTimer.timeScale = 1 + (0.2*this.scroll);
 
-                //scales player jump to platform speed
+                //scale player jump to platform speed
                 this.player.jumpHeight -= 15; // 90 is = to this.scroll*jumpheight //flag may need balancing
                 
                 //update speed of existing platforms and objects
@@ -683,35 +648,146 @@ class Play extends Phaser.Scene {
         }
     }
 
-    spawnObject(x, y){
+    /******************
+     * ooze functions *
+     ******************/
+
+    // oozeCreep()
+    //  makes the ooze creep down the screen an amount determined by
+    //  game.settings.oozeSpeed and game.settings.oozeDrop
+    oozeCreep() {
+        this.ooze.body.setVelocityY(game.settings.oozeSpeed);
+        let timer = this.time.delayedCall(game.settings.oozeDrop, this.stopOoze, [], this);
+    }
+
+    // stopOoze()
+    //  stop ooze immediately
+    stopOoze() {
+        this.ooze.body.setVelocityY(0);
+    }
+
+    /******************************
+     * player collision callbacks *
+     ******************************/
+
+    playerHitPlatform(player, platform) {
+
+        // make sure player is on top of platform
+        if ((player.y + player.height/2 -1) < platform.y) {
+            player.isJump = false;
+        }
+    }
+
+    playerGrabBox(player, box) {
+        //will not work if player is moving (bug or feature?)
+        if (!player.hasBox && Phaser.Input.Keyboard.JustDown(keyINTERACT)) {
+            player.hasBox = true;
+            box.destroy();
+        }
+    }
+
+    playerShelving(player, shelf) { //will not work if player is moving (bug or feature?)
+        if(player.hasBox && Phaser.Input.Keyboard.JustDown(keyINTERACT)){
+            player.hasBox = false;
+            player.isShelve = true;
+            let timer = this.time.delayedCall(500, () => { //flag balance
+                player.isShelve = false;
+                //spawn full shelf sprite
+                this.spawnFullShelf(shelf.x, shelf.y);
+                this.madeBox = false;
+                shelf.destroy();
+            }, null, this);
+        }
+    }
+
+    playerCleaning(player, mess){
+        if(Phaser.Input.Keyboard.JustDown(keyINTERACT)){
+            player.isMop = true;
+            let timer = this.time.delayedCall(750, () => { //flag balance
+                player.isMop = false;
+                mess.destroy();
+            }, null, this);
+        }
+    }
+
+    playerBumping(player, customer){
+        this.spawnAngryCustomer(customer.x,customer.y);
+        customer.destroy();
+        // creep ooze down
+        this.oozeCreep(); //turn on if you want ooze to move when customer is bumped
+    }
+
+    /******************************
+     * platform + object spawning *
+     ******************************/
+
+    // makePlatform()
+    //  spawn platform randomly at bottom of screen
+    makePlatform() {
+
+        let sx = Phaser.Math.RND.between(this.xL, this.xR);
+        this.xL = sx-(game.config.width*.5); //flag (*2/3) in 540p
+        if (this.xL < -25)this.xL = 0;
+        this.xR = sx+(game.config.width*.5); //flag (*2/3) in 540p
+        if (this.xR > game.config.width+25)this.xR = game.config.width;
+        //console.log(sx);
+
+        let platform = this.platforms.create(sx, game.config.height+150, "sprites", "rampsmall");
+
+        platform.setScale(1);
+        platform.body.allowGravity = false;
+        platform.body.immovable = true;
+        platform.body.velocity.y = this.platMod*this.scroll;
+        platform.body.checkCollision.left = false;
+        platform.body.checkCollision.right = false;
+        platform.body.checkCollision.down = false;
+        platform.setFrictionX(1);
+        platform.setDepth(this.PLATFORM_DEPTH);
+
+        // 30% chance of spawning box / shelf
+        let objectChance = 30; //remember to make this 30 again  //check
+
+        let spawnRoll = Phaser.Math.RND.between(0, 100);
+
+        // runs code to determine what object is spawned
+        if (spawnRoll <= objectChance) {
+            let xRandom = Phaser.Math.RND.between(sx-100, sx+100); // flag make sure number is <= (platform width-largest object width)/2
+            if (xRandom < 50) xRandom = 50;
+            if (xRandom > game.config.width-50) xRandom = game.config.width-50;
+            this.spawnObject(xRandom, game.config.height+150-(platform.height/2));
+        }
+    }
+
+    spawnObject(x, y) {
 
         //needs an order
-        let topBound = 67; //remember to set to 67 //check
-        let bottomBound = 34; //remember to set to 34 //check
+        let topBound = 67;
+        let bottomBound = 34;
 
-        let typeRoll = Phaser.Math.RND.between(1, 100);//change to 1, 3
+        let typeRoll = Phaser.Math.RND.between(1, 100); //change to 1, 3
 
-        if(typeRoll <= topBound && typeRoll >= bottomBound){
+        if (typeRoll<=topBound && typeRoll>=bottomBound) {
             if (!this.madeBox) {
-                this.spawnBox(x, y);
-                //console.log("A wild BOX appears!");
-                this.madeBox = true;
+                if (!this.player.hasBox) {
+                    this.spawnBox(x, y);
+                    this.madeBox = true;
+                } else {
+                    this.madeBox = true;
+                }
             } else {
                 this.spawnShelf(x, y); 
-                //console.log("A wild SHELF appears!");
                 this.madeBox = false;
             }
-        } else if(typeRoll >= topBound){
+        } else if (typeRoll >= topBound) {
             this.spawnMess(x, y);
-            //console.log("A wild MESS appears!");
-        }else if(typeRoll <= bottomBound){
+        } else if (typeRoll <= bottomBound){ 
             this.spawnCustomer(x, y);
-            //console.log("A wild CUSTOMER appears!");
         }
         
     }
 
-    spawnBox(x, y){
+    spawnBox(x, y) {
+
         let box = this.boxes.create(x, y, "sprites", "Box");
 
         box.setScale(1);
@@ -724,9 +800,12 @@ class Play extends Phaser.Scene {
         box.body.checkCollision.right = false;
         box.body.checkCollision.down = false;
         box.setFrictionX(1);
+        box.setDepth(this.BOX_DEPTH);
+
     }
 
-    spawnShelf(x, y){
+    spawnShelf(x, y) {
+
         let shelf = this.shelves.create(x, y, "sprites", "ShelfEmpty"); //change size of sprite??
 
         shelf.setScale(1);
@@ -739,9 +818,12 @@ class Play extends Phaser.Scene {
         shelf.body.checkCollision.right = false;
         shelf.body.checkCollision.down = false;
         shelf.setFrictionX(1);
+        shelf.setDepth(this.SHELF_DEPTH);
+
     }
 
-    spawnFullShelf(x, y){
+    spawnFullShelf(x, y) {
+
         let shelf = this.fullShelves.create(x, y, "sprites", "ShelfFull"); //change size of sprite??
 
         shelf.setScale(1);
@@ -754,9 +836,12 @@ class Play extends Phaser.Scene {
         shelf.body.checkCollision.right = false;
         shelf.body.checkCollision.down = false;
         shelf.setFrictionX(1);
+        shelf.setDepth(this.SHELF_DEPTH);
+
     }
 
-    spawnMess(x, y){
+    spawnMess(x, y) {
+
         let mess = this.messes.create(x, y, "sprites", "mess1");
 
         mess.setScale(1);
@@ -769,10 +854,13 @@ class Play extends Phaser.Scene {
         mess.body.checkCollision.right = false;
         mess.body.checkCollision.down = false;
         mess.setFrictionX(1);
-        mess.anims.play("smell");
+        mess.anims.play("smell", true);
+        mess.setDepth(this.MESS_DEPTH);
+
     }
 
-    spawnCustomer(x, y){
+    spawnCustomer(x, y) {
+
         let customer = this.customers.create(x, y, "sprites", "customerNeutral");
 
         customer.setScale(1);
@@ -781,9 +869,12 @@ class Play extends Phaser.Scene {
         customer.body.immovable = true;
         customer.body.velocity.y = this.platMod*this.scroll;
         customer.setFrictionX(1);
+        customer.setDepth(this.CUSTOMER_DEPTH);
+
     }
 
-    spawnAngryCustomer(x,y){
+    spawnAngryCustomer(x,y) {
+   
         let agCustomer = this.agCustomers.create(x, y, "sprites", "customerAngry");
 
         agCustomer.setScale(1);
@@ -797,15 +888,8 @@ class Play extends Phaser.Scene {
         agCustomer.body.checkCollision.down = false;
         agCustomer.setFrictionX(1);
         agCustomer.anims.play('customerBump'); //flag
-    }
-
-    oozeCreep() {
-        this.ooze.body.setVelocityY(game.settings.oozeSpeed);
-        let timer = this.time.delayedCall(game.settings.oozeDrop, this.stopOoze, [], this);
-    }
-
-    stopOoze() {
-        this.ooze.body.setVelocityY(0);
+        agCustomer.setDepth(this.CUSTOMER_DEPTH);
+   
     }
 
 }

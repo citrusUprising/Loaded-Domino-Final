@@ -6,14 +6,15 @@ class Menu extends Phaser.Scene {
     
     preload() {
 
-        // load title screen images
-        //this.load.image('title', './assets/tempTitle.png');
-        this.load.image('back', './assets/back.png');
-        this.load.image('title', './assets/title.png');
+        // load title screen image
+        this.load.spritesheet("title", "assets/title.png", {
+            frameWidth: 1280, frameHeight :720,
+            startFrame: 0, endFrame: 2
+        });
 
         // load music
-        this.load.audio('menuMusic', './assets/OnMyWay.mp3');
-        this.load.audio('gameMusic', './assets/TheShowMustBeGo.mp3');
+        this.load.audio('menuMusic', 'assets/bgm/OnMyWay.mp3');
+        this.load.audio('gameMusic', 'assets/bgm/TheShowMustBeGo.mp3');
 
         // load sfx
 		this.load.audio("sfxJump", ["assets/sfx/jump.mp3", "assets/sfx/jump.ogg"]);
@@ -25,17 +26,24 @@ class Menu extends Phaser.Scene {
     
     create() {
 
-        // add title backdrop
-        this.backdrop = this.add.tileSprite(0, 0, 960, 540, "title").setOrigin(0,0).setScale(4/3); //flag remove set scale on asset change
+        this.backdrop = this.add.sprite(0, 0, "title").setOrigin(0,0);
+        
+        this.anims.create({
+            key: "tsAnimation",
+            frames: this.anims.generateFrameNumbers("title", { start: 0, end: 2 }),
+            frameRate: 4,
+            repeat: -1
+        });
+
+        this.backdrop.anims.play("tsAnimation");
 
         let musicConfig = {
             mute: false,
-            volume: .5*game.settings.musicVolume,
+            volume: 0.5*game.settings.musicVolume,
             loop: true
         }
 
-        
-        if(!game.settings.tutorOpen){
+        if (!game.settings.tutorOpen) {
            game.settings.bgm = this.sound.add('menuMusic', musicConfig);
            game.settings.bgm.play();
         }

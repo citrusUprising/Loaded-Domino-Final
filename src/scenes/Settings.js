@@ -67,7 +67,7 @@ class Settings extends Phaser.Scene {
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-        keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        keyJUMP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
     }
 
@@ -92,7 +92,7 @@ class Settings extends Phaser.Scene {
         }
 
            //changes which setting is toggled
-           if(Phaser.Input.Keyboard.JustDown(keySPACE)){
+           if(Phaser.Input.Keyboard.JustDown(keyJUMP)){
                 if(this.volSelect)this.volSelect = false;//sets to Effect Volume
                else this.volSelect = true;//sets to Music Volume
             }
