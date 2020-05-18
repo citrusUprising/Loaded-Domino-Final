@@ -7,7 +7,8 @@ class Menu extends Phaser.Scene {
     preload() {
 
         // load title screen image
-        this.load.spritesheet("title", "assets/title.png", {
+        this.load.image('titleInit', 'assets/titleInit.png')
+        this.load.spritesheet("title", "assets/titleScroll.png", {
             frameWidth: 1280, frameHeight :720,
             startFrame: 0, endFrame: 2
         });
@@ -26,12 +27,12 @@ class Menu extends Phaser.Scene {
     
     create() {
 
-        this.backdrop = this.add.sprite(0, 0, "title").setOrigin(0,0);
+        this.backdrop = this.add.sprite(0, 0, "titleInit").setOrigin(0,0);
         
         this.anims.create({
             key: "tsAnimation",
-            frames: this.anims.generateFrameNumbers("title", { start: 0, end: 2 }),
-            frameRate: 4,
+            frames: this.anims.generateFrameNumbers("title", { start: 0, end: 2}),
+            frameRate: 3,
             repeat: -1
         });
 

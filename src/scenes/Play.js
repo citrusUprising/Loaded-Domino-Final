@@ -16,7 +16,7 @@ class Play extends Phaser.Scene {
         this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
 
         // load void spritesheet
-        this.load.spritesheet("void", "assets/void.png", {
+        this.load.spritesheet("void", "assets/voidAnim.png", {
             frameWidth: 1280, frameHeight :867,
             startFrame: 0, endFrame: 29
         });
@@ -131,7 +131,7 @@ class Play extends Phaser.Scene {
 				end: 10,
                 zeroPad: 0
 			}),
-            frameRate: 30,
+            frameRate: 24,
             repeat: -1
         });
 
@@ -143,7 +143,7 @@ class Play extends Phaser.Scene {
 				end: 10,
                 zeroPad: 0
 			}),
-            frameRate: 30,
+            frameRate: 16,
             repeat: -1
         });
 
@@ -154,7 +154,7 @@ class Play extends Phaser.Scene {
 
         this.anims.create({
 			key: "boxIdle",
-			frames: [{ key: "sprites", frame: "char" }]//flag change to box idle
+			frames: [{ key: "sprites", frame: "charBox" }]
         });
         
         this.anims.create({
@@ -175,7 +175,7 @@ class Play extends Phaser.Scene {
 				end: 4,
                 zeroPad: 0
 			}),
-            frameRate: 10,
+            frameRate: 5,
             repeat: -1
         });
         
@@ -187,7 +187,7 @@ class Play extends Phaser.Scene {
 				end: 4,
                 zeroPad: 0
 			}),
-            frameRate: 10,
+            frameRate: 5,
             repeat: -1
         });
 
@@ -206,7 +206,7 @@ class Play extends Phaser.Scene {
         this.anims.create({
 			key: "customerBump",
 			frames: this.anims.generateFrameNames("sprites", {
-				prefix: "customer",
+				prefix: "customerMad",
 				start: 1,
 				end: 11,
                 zeroPad: 0
@@ -547,9 +547,9 @@ class Play extends Phaser.Scene {
             if (shelf.y < this.ooze.y-shelf.height) {
                 shelf.destroy();
                 // creep ooze down
-                if (!this.gameOverTop && !this.gameOverBot) {
+                if (!this.gameoverTop) {//flag
                     this.oozeCreep();
-                }
+                } else console.log('ooze continues')
             }
         }, this);
 
@@ -565,9 +565,9 @@ class Play extends Phaser.Scene {
             if (mess.y < this.ooze.y-mess.height) {
                 mess.destroy();
                 // creep ooze down
-                if (!this.gameOverTop && !this.gameOverBot) {
+                if (!this.gameoverTop) {//flag
                     this.oozeCreep();
-                }
+                } else console.log('ooze continues')
             }
         }, this);
 
@@ -714,7 +714,9 @@ class Play extends Phaser.Scene {
         this.spawnAngryCustomer(customer.x,customer.y);
         customer.destroy();
         // creep ooze down
-        this.oozeCreep(); //turn on if you want ooze to move when customer is bumped
+        if (!this.gameOverTop && !this.gameOverBot) {
+            this.oozeCreep();
+        } //turn on if you want ooze to move when customer is bumped
     }
 
     /******************************
@@ -861,7 +863,7 @@ class Play extends Phaser.Scene {
 
     spawnCustomer(x, y) {
 
-        let customer = this.customers.create(x, y, "sprites", "customerNeutral");
+        let customer = this.customers.create(x, y, "sprites", "customerIdle");
 
         customer.setScale(1);
         customer.setOrigin(.5,1);
