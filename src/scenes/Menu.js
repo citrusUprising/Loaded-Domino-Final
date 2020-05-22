@@ -93,7 +93,7 @@ class Menu extends Phaser.Scene {
         
         this.add.text (
             centerX, centerY, 
-            'Press ↑ to start Tutorial', menuConfig
+            'Press ↑ to open Rules', menuConfig
         ).setOrigin(0.5);
 
         this.add.text (
@@ -116,16 +116,24 @@ class Menu extends Phaser.Scene {
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
+        keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE); //check debugging only
     
     }
 
     update() {
 
-        if (Phaser.Input.Keyboard.JustDown(keyUP)) {
+        if (Phaser.Input.Keyboard.JustDown(keySPACE)) {//check debugging only
             // go to tutorial
             //this.sound.play('name');
             game.settings.tutorOpen = true;
             this.scene.start("tutorialScene");
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(keyUP)) {
+            // go to rules
+            //this.sound.play('name');
+            game.settings.tutorOpen = true;
+            this.scene.start("rulesScene");
         }
         if (Phaser.Input.Keyboard.JustDown(keyLEFT)) {
             // go to Settings
@@ -142,7 +150,7 @@ class Menu extends Phaser.Scene {
         }
 
         if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
-            // go to tutorial
+            // go to rules
             //this.sound.play('name');
             game.settings.tutorOpen = true;
             this.scene.start("creditScene");

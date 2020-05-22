@@ -359,17 +359,6 @@ class Play extends Phaser.Scene {
             this.background.tilePositionY += this.scroll*delta*2/33;
  
             // update player
-            
-            // cam note: ive commented this out for now 2 work on speed
-            /*
-            console.log('before update: '+this.player.isJump);
-            this.player.update();
-            console.log('mid update: '+this.player.isJump);
-            this.player.isJump = true;
-            console.log('after update: '+this.player.isJump);
-            */
-
-            // update player
             this.player.update();
             this.player.isJump = true;
 

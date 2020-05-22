@@ -21,7 +21,7 @@ let config = {
 	type: Phaser.CANVAS,
 	width: 1280,
 	height: 720,
-	scene: [ Menu, Tutorial, Play, Credits, Settings ],
+	scene: [ Menu, Tutorial, Rules, Play, Credits, Settings ],
 	physics: {
 		default: "arcade",
 		arcade: {
@@ -48,4 +48,4 @@ game.settings = {
 }
 
 // define key constants
-let keyLEFT, keyRIGHT,  keyUP, keyDOWN, keyJUMP, keyINTERACT;
+let keyLEFT, keyRIGHT,  keyUP, keyDOWN, keyJUMP, keyINTERACT, keySPACE;
