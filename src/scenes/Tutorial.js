@@ -31,10 +31,12 @@ class Tutorial extends Phaser.Scene {
 
         this.BG_DEPTH= -999;
         this.PLATFORM_DEPTH = -998;
-        this.BOX_DEPTH = -996;
-        this.SHELF_DEPTH = -997;
-        this.MESS_DEPTH = -997;
-        this.CUSTOMER_DEPTH = -997;
+        this.BOX_DEPTH = -994;
+        this.SHELF_DEPTH = -995;
+        this.MESS_DEPTH = -995;
+        this.CUSTOMER_DEPTH = -995;
+        this.TEXT_DEPTH = -996;
+        this.TEXTBACK_DEPTH = -997;
 
         /**********************
          *  set up variables  *
@@ -49,6 +51,17 @@ class Tutorial extends Phaser.Scene {
         this.gameoverBot = false;
 
         this.platWidth = 320;
+        this.platDist = 140;
+
+        //makes text not directly overlap objects
+        this.promptOffset = 50;
+
+        //opens tutorial end
+        this.finish = 4;
+        this.checkBox = false;
+        this.checkMess = false;
+        this.checkCust = false;
+        this.checkShelf = false;
 
         /****************
          * text configs *
@@ -94,6 +107,18 @@ class Tutorial extends Phaser.Scene {
         this.gameOverInstructionsConfig = {
             fontFamily: 'Helvetica',
             fontSize: '30px',
+            color: '#e7d97d',
+            align: 'center',
+            padding: {
+                top: 10,
+                bottom: 10,
+            },
+            fixedWidth: 0
+        }
+
+        this.instructionConfig = {
+            fontFamily: 'Helvetica',
+            fontSize: '15px',
             color: '#e7d97d',
             align: 'center',
             padding: {
@@ -187,10 +212,10 @@ class Tutorial extends Phaser.Scene {
 			frames: this.anims.generateFrameNames("sprites", {
 				prefix: "mess",
 				start: 1,
-				end: 4,
+				end: 6,
                 zeroPad: 0
 			}),
-            frameRate: 30, //flag
+            frameRate: 20, //flag
             repeat: -1
         });
 
@@ -235,7 +260,7 @@ class Tutorial extends Phaser.Scene {
          * add player *
          **************/
 
-		this.player = new Player(this, 100, 50, "sprites", "char").setOrigin(0.5);
+		this.player = new Player(this, game.config.width-100, 50, "sprites", "char").setOrigin(0.5);
         this.physics.add.existing(this.player);
 
         // setup player physics
@@ -283,26 +308,27 @@ class Tutorial extends Phaser.Scene {
         /***********************
          * construct platforms *
          ***********************/
-        this.makePlatform(50, 150, 0);
-        this.makePlatform(50+this.platWidth, 150, 0);
-        this.makePlatform(50+2*this.platWidth, 150, 1);
-        this.makePlatform(50+3*this.platWidth, 150, 0);
 
-        this.makePlatform(50+4*this.platWidth, game.config.height-200, 0);
+        this.makePlatform(this.platWidth, 150, 0);
+        this.makePlatform(2*this.platWidth, 150, 1); //box
+        this.makePlatform(3*this.platWidth, 150, 0);
+        this.makePlatform(4*this.platWidth, 150, 0);
 
-        this.makePlatform(50, game.config.height, 1);
-        this.makePlatform(50+this.platWidth, game.config.height, 0);
-        this.makePlatform(50+2*this.platWidth, game.config.height, 0);
-        this.makePlatform(50+3*this.platWidth, game.config.height, 3);
-        this.makePlatform(50+4*this.platWidth, game.config.height, 0);
+        this.makePlatform(50, 150+this.platDist, 0);
+        this.makePlatform(50+this.platWidth, 150+this.platDist, 0);
+        this.makePlatform(50+2*this.platWidth, 150+this.platDist, 2); //mess
+        this.makePlatform(50+3*this.platWidth, 150+this.platDist, 0);
 
-        /*****************
-         * place objects *
-         *****************/
+        this.makePlatform(this.platWidth, 150+2*this.platDist, 0);
+        this.makePlatform(2*this.platWidth, 150+2*this.platDist, 0);
+        this.makePlatform(3*this.platWidth, 150+2*this.platDist, 3); //customer
+        this.makePlatform(4*this.platWidth, 150+2*this.platDist, 0);
 
-        /***************
-         * Pop-in text *
-         ***************/
+        this.makePlatform(50, 150+3*this.platDist, 1); //shelf
+        this.makePlatform(50+this.platWidth, 150+3*this.platDist, 0);
+        this.makePlatform(50+2*this.platWidth, 150+3*this.platDist, 0);
+        this.makePlatform(50+3*this.platWidth, 150+3*this.platDist, 0);
+        this.makePlatform(50+4*this.platWidth, 150+3*this.platDist, 0);
 
         /***************
          * assign keys *
@@ -318,7 +344,12 @@ class Tutorial extends Phaser.Scene {
     }
 
     update(time, delta) {
-       
+
+        this.makeText(game.config.width-100-this.promptOffset, 50+this.promptOffset,140,90,1,1,
+            "Welcome to Work",
+            "Move with ← and →",
+            "Use [Z] to jump");
+
         // if player hasn't died yet
         if (!this.gameoverBot) {
 
@@ -338,7 +369,7 @@ class Tutorial extends Phaser.Scene {
 
             // check if player died
             // give player some leeway so they don't get eaten by particles
-            if (this.player.y >game.config.height-80&&this.player.x >game.config.width-100) {
+            if (this.player.y >150+2*this.platDist&&this.player.x >game.config.width-100&&this.finish<=0) {
                 this.gameoverBot = true;
                 this.physics.world.setBounds(0, -100, game.config.width+50, game.config.height+200);
             }
@@ -527,14 +558,27 @@ class Tutorial extends Phaser.Scene {
     }
 
     playerGrabBox(player, box) {
-        //will not work if player is moving (bug or feature?)
+        if(!this.checkBox){
+        this.makeText(2*this.platWidth,150-this.promptOffset,260,90,1,1,
+            "Take Boxes to Shelves",
+            "Use [X] to pick up",
+            "You move slower while carrying Boxes");
+        }
         if (!player.hasBox && Phaser.Input.Keyboard.JustDown(keyINTERACT)) {
             player.hasBox = true;
+            this.finish -= 1;
             box.destroy();
         }
+        this.checkBox = true;
     }
 
     playerShelving(player, shelf) { //will not work if player is moving (bug or feature?)
+        if(!this.checkShelf){
+            this.makeText(50+this.promptOffset, 150+3*this.platDist-this.promptOffset,165,90,0,1,//check
+                "Bring Boxes here",
+                "Use [X] to shelve Boxes",
+                "It takes a little time to do");
+            }
         if(player.hasBox && Phaser.Input.Keyboard.JustDown(keyINTERACT)){
             player.hasBox = false;
             player.isShelve = true;
@@ -543,22 +587,38 @@ class Tutorial extends Phaser.Scene {
                 //spawn full shelf sprite
                 this.spawnFullShelf(shelf.x, shelf.y);
                 this.madeBox = false;
+                this.finish -= 1;
                 shelf.destroy();
             }, null, this);
         }
     }
 
     playerCleaning(player, mess){
+        if(!this.checkMess){
+            this.makeText(50+2*this.platWidth, 150+this.platDist-this.promptOffset,220,90,0,1,//check
+                "Clean up Messes you encounter",
+                "Use [X] to clean",
+                "Cleaning takes time");
+            }
         if(Phaser.Input.Keyboard.JustDown(keyINTERACT)){
             player.isMop = true;
             let timer = this.time.delayedCall(750, () => { //flag balance
                 player.isMop = false;
+                this.finish -= 1;
                 mess.destroy();
             }, null, this);
         }
     }
 
     playerBumping(player, customer){
+        if(!this.checkCust){
+            this.finish -= 1;
+            this.makeText(3*this.platWidth-this.promptOffset, 150+2*this.platDist-this.promptOffset,225,90,1,1,//check
+                "Customers peruse the isles",
+                "Make sure to not bump into them",
+                "or they will get angry");
+        } 
+        this.checkCust = true;
         this.spawnAngryCustomer(customer.x,customer.y);
         customer.destroy();
         // creep ooze down
@@ -716,6 +776,30 @@ class Tutorial extends Phaser.Scene {
         agCustomer.anims.play('customerBump'); //flag
         agCustomer.setDepth(this.CUSTOMER_DEPTH);
    
+    }
+
+    makeText(x,y,width,height,originX,originY,line1,line2,line3){
+        let back = this.add.rectangle (
+            x, y, width, height, 0x000000
+        ).setOrigin(originX, originY).setDepth(this.TEXTBACK_DEPTH);
+        
+        let textX = x;
+        if(originX == 1)textX = x-5;
+        else if(originX == 0)textX = x+5;
+        else textX = x;
+
+        let text1 = this.add.text (
+            textX, y-(height*2/3),
+            line1, this.instructionConfig
+        ).setOrigin(originX, originY).setDepth(this.TEXT_DEPTH);
+        let text2 = this.add.text (
+            textX, y-(height/3),
+            line2, this.instructionConfig
+        ).setOrigin(originX, originY).setDepth(this.TEXT_DEPTH);
+        let text3 = this.add.text (
+            textX, y,
+            line3, this.instructionConfig
+        ).setOrigin(originX, originY).setDepth(this.TEXT_DEPTH);
     }
 
 }

@@ -17,10 +17,10 @@ class Rules extends Phaser.Scene {
 			frames: this.anims.generateFrameNames("sprites", {
 				prefix: "mess",
 				start: 1,
-				end: 4,
+				end: 6,
                 zeroPad: 0
 			}),
-            frameRate: 30, //flag
+            frameRate: 20, //flag
             repeat: -1
         });
 
