@@ -16,8 +16,8 @@ class Play extends Phaser.Scene {
         this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
 
         // load void spritesheet
-        this.load.spritesheet("void", "assets/voidAnim.png", {
-            frameWidth: 1280, frameHeight :867,
+        this.load.spritesheet("void", "assets/voidtest.png", {
+            frameWidth: 1280, frameHeight: 150,
             startFrame: 0, endFrame: 29
         });
         
@@ -279,10 +279,15 @@ class Play extends Phaser.Scene {
          * add ooze *
          ************/
 
-        this.ooze = new Ooze(this, 0, 0, "voidStatic", 0).setOrigin(0, 1);
+        this.ooze = new Ooze(this, 0, -40, "voidStatic", 0).setOrigin(0, 0.33);
         this.physics.add.existing(this.ooze);
         this.ooze.body.allowGravity = false;
         this.ooze.body.immovable = true;
+        this.oozeMass = this.add.rectangle (
+            0, -game.config.height + this.ooze.y - 100,
+            game.config.width, game.config.height + 100,
+            0x000000
+        ).setOrigin(0,0);
 
         /******************
          * add scoreboard *
@@ -546,9 +551,12 @@ class Play extends Phaser.Scene {
         } 
 
         // prevent ooze from going off screen
-        if (this.ooze.y > game.config.height+100) {
+        if (this.ooze.y > game.config.height) {
             this.stopOoze();
-        }        
+        }
+
+        // move ooze mass where it needs to be
+        this.oozeMass.y = this.ooze.y - game.config.height - 100;
 
     }
 
