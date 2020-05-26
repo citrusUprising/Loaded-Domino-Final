@@ -49,14 +49,14 @@ class Settings extends Phaser.Scene {
 
         this.add.text (
             centerX, centerY+4*textSpacer, 
-            'SPACE to toggle setting, ↑ to increase, ↓ to decrease', menuConfig
+            '← and → to toggle setting, ↑ and ↓ to change', menuConfig
         ).setOrigin(0.5);
 
         menuConfig.color = '#de7183';
 
         this.add.text (
             centerX, centerY+5*textSpacer, 
-            '← Menu   → Start Shift', menuConfig
+            'Press [X] to return to menu', menuConfig
         ).setOrigin(0.5);
 
         this.initHeight = 260;
@@ -67,7 +67,7 @@ class Settings extends Phaser.Scene {
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
-        keyJUMP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        keyBACK = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
 
     }
 
@@ -91,46 +91,60 @@ class Settings extends Phaser.Scene {
             }
         }
 
-           //changes which setting is toggled
-           if(Phaser.Input.Keyboard.JustDown(keyJUMP)){
-                if(this.volSelect)this.volSelect = false;//sets to Effect Volume
-               else this.volSelect = true;//sets to Music Volume
-            }
-
-           if(Phaser.Input.Keyboard.JustDown(keyUP)){
-            if(this.volSelect){
-                game.settings.musicVolume += .1
-                if(game.settings.musicVolume > 1)game.settings.musicVolume=1;
-                game.settings.bgm.volume =.6*game.settings.musicVolume;
-                }else{
-                game.settings.effectVolume += .1
-                if(game.settings.effectVolume > 1)game.settings.effectVolume=1;
-                this.sound.play("sfxJump", {volume: 0.4*game.settings.effectVolume});
+            //changes which setting is toggled
+            if (Phaser.Input.Keyboard.JustDown(keyLEFT) || Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
+                if (this.volSelect) {
+                    this.volSelect = false;//sets to Effect Volume
+                } else {
+                    this.volSelect = true;//sets to Music Volume
                 }
             }
 
-           if(Phaser.Input.Keyboard.JustDown(keyDOWN)){
-            if(this.volSelect){
-                game.settings.musicVolume -= .1
-                if(game.settings.musicVolume < 0)game.settings.musicVolume=0;
-                game.settings.bgm.volume =.6*game.settings.musicVolume;
-                }else{
-                game.settings.effectVolume -= .1
-                if(game.settings.effectVolume < 0)game.settings.effectVolume=0;
-                this.sound.play("sfxJump", {volume: 0.4*game.settings.effectVolume});
+            if (Phaser.Input.Keyboard.JustDown(keyUP)) {
+                if (this.volSelect) {
+                    game.settings.musicVolume += .1;
+                    if (game.settings.musicVolume > 1) {
+                        game.settings.musicVolume = 1;
+                    }
+                    game.settings.bgm.volume = .6*game.settings.musicVolume;
+                } else {
+                    game.settings.effectVolume += .1
+                    if (game.settings.effectVolume > 1) {
+                        game.settings.effectVolume = 1;
+                    }
+                    this.sound.play("sfxJump", {volume: 0.4*game.settings.effectVolume});
                 }
             }
 
-            //left returns to menu
-            if(Phaser.Input.Keyboard.JustDown(keyLEFT)) {
+            if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
+                if (this.volSelect) {
+                    game.settings.musicVolume -= .1
+                    if (game.settings.musicVolume < 0) {
+                        game.settings.musicVolume = 0;
+                    }
+                    game.settings.bgm.volume = .6*game.settings.musicVolume;
+                } else {
+                    game.settings.effectVolume -= .1;
+                    if (game.settings.effectVolume < 0) {
+                        game.settings.effectVolume = 0;
+                    }
+                    this.sound.play("sfxJump", {volume: 0.4*game.settings.effectVolume});
+                }
+            }
+
+            //X returns to menu
+            if(Phaser.Input.Keyboard.JustDown(keyBACK)) {
                 this.scene.start("menuScene");
             }
+
+            /*
             //right starts game
             if(Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
                 game.settings.bgm.stop();
                 game.settings.tutorOpen = false;
                 this.scene.start("playScene");
             }
+            */
         
     }
 }

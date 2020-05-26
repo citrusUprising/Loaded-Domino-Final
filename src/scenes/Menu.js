@@ -27,6 +27,9 @@ class Menu extends Phaser.Scene {
     
     create() {
 
+        // menu cursor location
+        this.selected = "play";
+
         this.backdrop = this.add.sprite(0, 0, "titleInit").setOrigin(0,0);
         
         this.anims.create({
@@ -48,26 +51,14 @@ class Menu extends Phaser.Scene {
            game.settings.bgm = this.sound.add('menuMusic', musicConfig);
            game.settings.bgm.play();
         }
-       /* let titleConfig = {
-            fontFamily: 'Helvetica',
-            fontSize: '60px',
-            backgroundColor: '#000000',
-            color: '#ffffff',
-            align: 'center',
-            padding: {
-                top: 10,
-                bottom: 10,
-            },
-            fixedWidth: 0
-        }*/
 
         // menu text config
         let menuConfig = {
             fontFamily: 'Helvetica',
             fontSize: '30px',
+            align: 'left',
             backgroundColor: '#000000',
             color: '#de7183',
-            align: 'center',
             padding: {
                 top: 10,
                 bottom: 10,
@@ -76,9 +67,10 @@ class Menu extends Phaser.Scene {
         }
 
         //Location markers and text spacing
-        let centerX = game.config.width/2;
+        let centerX = game.config.width/2 - 120;
         let centerY = game.config.height/2;
-        let textSpacer = 80;
+        
+        this.textSpacer = 80;
 
         // add titlecard sprite
         /*this.titleCard = this.add.tileSprite (
@@ -93,43 +85,106 @@ class Menu extends Phaser.Scene {
         
         this.add.text (
             centerX, centerY, 
-            'Press ↑ to open Rules', menuConfig
-        ).setOrigin(0.5);
+            'Clock In', menuConfig
+        )
 
         this.add.text (
-            centerX, centerY+textSpacer, 
-            'Press ← to change Settings', menuConfig
-        ).setOrigin(0.5);
+            centerX, centerY+this.textSpacer, 
+            'Training', menuConfig
+        )
 
         this.add.text (
-            centerX, centerY+2*textSpacer, 
-            'Press → to start Game', menuConfig
-        ).setOrigin(0.5); 
+            centerX, centerY+2*this.textSpacer, 
+            'Settings', menuConfig
+        ) 
 
         this.add.text (
-            centerX, centerY+3*textSpacer, 
-            'Press ↓ to view Credits', menuConfig
-        ).setOrigin(0.5); 
+            centerX, centerY+3*this.textSpacer, 
+            "Credits", menuConfig
+        )
         
+        // add selector
+        this.selectorText = this.add.text (
+            centerX-40, centerY, 
+            ' • ', menuConfig
+        )
+
+
         // titlescreen keyboard controls
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
         keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
-        keySPACE = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE); //check debugging only
+        keySELECT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.Z); //check debugging only
     
     }
 
     update() {
 
-        if (Phaser.Input.Keyboard.JustDown(keySPACE)) {//check debugging only
+        //if (Phaser.Input.Keyboard.JustDown(keySPACE)) {//check debugging only
             // go to tutorial
             //this.sound.play('name');
-            game.settings.tutorOpen = true;
-            this.scene.start("tutorialScene");
-        }
+        //    game.settings.tutorOpen = true;
+        //    this.scene.start("tutorialScene");
+        //}
 
         if (Phaser.Input.Keyboard.JustDown(keyUP)) {
+            switch (this.selected) {
+                case "tutorial":
+                    this.selected = "play";
+                    this.selectorText.y -= this.textSpacer;
+                    break;
+                case "settings":
+                    this.selected = "tutorial";
+                    this.selectorText.y -= this.textSpacer;
+                    break;
+                case "credits":
+                    this.selected = "settings";
+                    this.selectorText.y -= this.textSpacer;
+                    break;
+            }
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
+            switch (this.selected) {
+                case "play":
+                    this.selected = "tutorial";
+                    this.selectorText.y += this.textSpacer;
+                    break;
+                case "tutorial":
+                    this.selected = "settings";
+                    this.selectorText.y += this.textSpacer;
+                    break;
+                case "settings":
+                    this.selected = "credits";
+                    this.selectorText.y += this.textSpacer;
+                    break;
+            }
+        }
+
+        if (Phaser.Input.Keyboard.JustDown(keySELECT)) {
+            switch (this.selected) {
+                case "play":
+                    game.settings.bgm.stop();
+                    game.settings.tutorOpen = false;
+                    this.scene.start("playScene");
+                    break;
+                case "tutorial":
+                    game.settings.tutorOpen = true;
+                    this.scene.start("tutorialScene");
+                    break;
+                case "settings":
+                    game.settings.tutorOpen = true;
+                    this.scene.start("settingScene");
+                    break;
+                case "credits":
+                    game.settings.tutorOpen = true;
+                    this.scene.start("creditScene");
+                    break;
+            }
+        }
+
+        /*
             // go to rules
             //this.sound.play('name');
             game.settings.tutorOpen = true;
@@ -155,11 +210,7 @@ class Menu extends Phaser.Scene {
             game.settings.tutorOpen = true;
             this.scene.start("creditScene");
         }
-
-        // scroll backdrop and titlecard
-        /*this.backdrop.tilePositionX -= 2;
-        this.backdrop.tilePositionY -= 1;
-        this.titleCard.tilePositionX += 3;*/
+        */
 
     }
 }

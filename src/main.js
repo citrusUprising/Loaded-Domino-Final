@@ -28,7 +28,7 @@ let config = {
 			gravity: {
 				y: 700
 			},
-			debug: false
+			debug: true 
 		}
     },
 };
@@ -48,4 +48,4 @@ game.settings = {
 }
 
 // define key constants
-let keyLEFT, keyRIGHT,  keyUP, keyDOWN, keyJUMP, keyINTERACT, keySPACE;
+let keyLEFT, keyRIGHT,  keyUP, keyDOWN, keyJUMP, keyINTERACT, keySELECT, keyBACK, keySPACE;

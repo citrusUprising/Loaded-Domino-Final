@@ -6,20 +6,10 @@ class Tutorial extends Phaser.Scene {
     
     preload() {
 
-		// load temp images
-		//this.load.image("player", "assets/char.png");
-        //this.load.image("platform", "assets/rampsmall.png");
         this.load.image("backDrop", "assets/ware.png");
         this.load.image("voidStatic", "assets/voidStatic.png");
 
-        // load sprite atlas
         this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
-
-        // load void spritesheet
-        /*this.load.spritesheet("void", "assets/voidAnim.png", {
-            frameWidth: 1280, frameHeight :867,
-            startFrame: 0, endFrame: 29
-        });*/ //check
         
     }
 
@@ -43,6 +33,9 @@ class Tutorial extends Phaser.Scene {
          **********************/
 
         this.score = 0;   
+
+        // yea
+        this.selected = "play";
 
         // boolean that determines whether a box or shelf comes next
         this.madeBox = false;
@@ -131,13 +124,6 @@ class Tutorial extends Phaser.Scene {
         /*********************
          * create animations *
          *********************/
-        
-        /*this.anims.create({
-            key: "voidAnim",
-            repeat: -1,
-            frames: this.anims.generateFrameNumbers("void", { start: 0, end: 29, first: 0}),
-            frameRate: 30
-        });*/ //check
         
 		this.anims.create({
 			key: "playerRun",
@@ -260,7 +246,7 @@ class Tutorial extends Phaser.Scene {
          * add player *
          **************/
 
-		this.player = new Player(this, game.config.width-100, 50, "sprites", "char").setOrigin(0.5);
+		this.player = new Player(this, game.config.width-100, 80, "sprites", "char").setOrigin(0.5);
         this.physics.add.existing(this.player);
 
         // setup player physics
@@ -272,20 +258,11 @@ class Tutorial extends Phaser.Scene {
         this.player.body.setSize(40, 70);
         this.player.body.setOffset(5, 10);
 
-        /************
-         * add ooze *
-         ************/
-
-       /* this.ooze = new Ooze(this, 0, 0, "voidStatic", 0).setOrigin(0, 1);
-        this.physics.add.existing(this.ooze);
-        this.ooze.body.allowGravity = false;
-        this.ooze.body.immovable = true;*/ //check
-
         /******************
          * add scoreboard *
          ******************/
 
-        this.scoreBoard = this.add.text(0, 0, this.score, this.scoreBoardConfig);
+        //this.scoreBoard = this.add.text(0, 0, this.score, this.scoreBoardConfig);
 
         /********************
          * collision groups *
@@ -341,14 +318,15 @@ class Tutorial extends Phaser.Scene {
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
 
+        this.makeText(game.config.width-100-this.promptOffset, 50+this.promptOffset,140,90,1,1,
+            "Welcome to work!",
+            "Move with ← and →",
+            "Use [Z] to jump"
+        );
+
     }
 
     update(time, delta) {
-
-        this.makeText(game.config.width-100-this.promptOffset, 50+this.promptOffset,140,90,1,1,
-            "Welcome to Work",
-            "Move with ← and →",
-            "Use [Z] to jump");
 
         // if player hasn't died yet
         if (!this.gameoverBot) {
@@ -356,9 +334,6 @@ class Tutorial extends Phaser.Scene {
             // update player
             this.player.update();
             this.player.isJump = true;
-
-            // update ooze
-            //this.ooze.update(); //check
 
             //flip sprite when player turns
             if (this.player.isTurn) { 
@@ -385,13 +360,15 @@ class Tutorial extends Phaser.Scene {
                 this.player.body.allowGravity = false;
 
                 // hide scoreboard
-                this.scoreBoard.setVisible(false);
+                //this.scoreBoard.setVisible(false);
 
                 // final score
-                this.finScore = this.score;
+                //this.finScore = this.score;
 
                 // text spacer for game over text
                 let textSpacer = 60;
+                // kluuuuudddddgggeeee
+                this.textSpacer = textSpacer;
 
                 // create game over text
                 // note 2 cam from cam: clean this up, remove magic #s -love, cam
@@ -400,6 +377,7 @@ class Tutorial extends Phaser.Scene {
                     500, 360, 0x000000
                 ).setOrigin(0.5);
                 
+                // this is a really funny way to do this
                 this.add.text (
                     game.config.width/2, (game.config.height/2)-(2*textSpacer),
                     "Training Complete!", this.gameOverHeaderConfig
@@ -418,134 +396,62 @@ class Tutorial extends Phaser.Scene {
                 ).setOrigin(0.5);
 
                 this.add.text (
-                    game.config.width/2, game.config.height/2+textSpacer,
-                    "Press ↑ to start your shift", this.gameOverInstructionsConfig
-                ).setOrigin(0.5);
+                    game.config.width/2-80, game.config.height/2+textSpacer,
+                    "Start your shift", this.gameOverInstructionsConfig
+                );
 
                 this.add.text (
-                    game.config.width/2, game.config.height/2+2*textSpacer,
-                    "Press ↓ to return to menu", this.gameOverInstructionsConfig
-                ).setOrigin(0.5);
+                    game.config.width/2-80, game.config.height/2+2*textSpacer,
+                    "Return to menu", this.gameOverInstructionsConfig
+                );
+   
+                // add selector
+                this.selectorText = this.add.text (
+                    game.config.width/2-120, game.config.height/2+textSpacer,
+                    "•", this.gameOverInstructionsConfig
+                );
                 
             }
     
         // else, if player's dead
         } else {
 
-            // reset scene on player input
+            // handle menu
             if (Phaser.Input.Keyboard.JustDown(keyUP)) {
-                game.settings.bgm.stop();
-                game.settings.tutorOpen = false;
-                this.scene.start("playScene");           
+                switch (this.selected) {
+                    case "menu":
+                        this.selected = "play";
+                        this.selectorText.y -= this.textSpacer;
+                        break;
+                }
             }
 
-            // exit to menu on player input
             if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
-                this.scene.start("menuScene");
+                switch (this.selected) {
+                    case "play":
+                        this.selected = "menu";
+                        this.selectorText.y += this.textSpacer;
+                        break;
+                }
             }
 
+            if (Phaser.Input.Keyboard.JustDown(keyJUMP)) {
+                switch (this.selected) {
+                    case "play":
+                        game.settings.bgm.stop();
+                        game.settings.tutorOpen = false;
+                        this.scene.start("playScene");   
+                        break;
+                    case "menu":
+                        this.scene.start("menuScene");
+                        break;
+                }
+            }
         } 
 
-        // prevent ooze from going off screen
-        /*if (this.ooze.y > game.config.height+100) {
-            this.stopOoze();
-        }*/        
-
     }
 
-    // cleanUp()
-    // removes off-screen objects
-    /*cleanUp() {
-
-        // clean up platforms
-        this.platforms.children.each(function(platform) {
-            if (platform.y < -platform.height) {
-                platform.destroy();
-            }
-        }, this);
-
-        // clean up boxes
-        this.boxes.children.each(function(box) {
-            if (box.y < this.ooze.y-box.height) {
-                box.destroy();
-            }
-        }, this);
-
-        // clean up shelves
-        this.shelves.children.each(function(shelf) {
-            if (shelf.y < this.ooze.y-shelf.height) {
-                shelf.destroy();
-            }
-        }, this);
-
-        // clean up full shelves
-        this.fullShelves.children.each(function(fullShelf) {
-            if (fullShelf.y < this.ooze.y-fullShelf.height) {
-                fullShelf.destroy();
-            }
-        }, this);
-
-        // clean up messes
-        this.messes.children.each(function(mess) {
-            if (mess.y < this.ooze.y-mess.height) {
-                mess.destroy();
-            }
-        }, this);
-
-        // clean up customers
-        this.customers.children.each(function(customer) {
-            if (customer.y < this.ooze.y-customer.height) {
-                customer.destroy();
-            }
-        }, this);
-
-        // clean up angry customers
-        this.agCustomers.children.each(function(agCustomer) {
-            if (agCustomer.y < this.ooze.y-agCustomer.height) {
-                if (!this.gameOverBot && !this.gameOverBot) {
-                    agCustomer.destroy();
-                }
-                //turn on if you want ooze to move when customer hits top of screen
-                //this.oozeCreep();
-            }
-        }, this);
-
-    }*/ //check
-
-    // scoreUp()
-    //  increase score every second
-    scoreUp() {
-        
-        if (!this.gameOverBot) {
-        
-            // increment score
-            this.score++;
-
-            // update scoreBoard
-            this.scoreBoard.setText(this.score);
-    
-        }
-    }
-
-    /******************
-     * ooze functions *
-     ******************/
-
-    // oozeCreep()
-    //  makes the ooze creep down the screen an amount determined by
-    //  game.settings.oozeSpeed and game.settings.oozeDrop
-   /* oozeCreep() {
-        this.ooze.body.setVelocityY(game.settings.oozeSpeed);
-        let timer = this.time.delayedCall(game.settings.oozeDrop, this.stopOoze, [], this);
-    }
-
-    // stopOoze()
-    //  stop ooze immediately
-    stopOoze() {
-        this.ooze.body.setVelocityY(0);
-    }*/ //check
-
-    /******************************
+   /******************************
      * player collision callbacks *
      ******************************/
 
@@ -555,30 +461,34 @@ class Tutorial extends Phaser.Scene {
         if ((player.y + player.height/2 -1) < platform.y) {
             player.isJump = false;
         }
+
     }
 
     playerGrabBox(player, box) {
-        if(!this.checkBox){
-        this.makeText(2*this.platWidth,150-this.promptOffset,260,90,1,1,
-            "Take Boxes to Shelves",
-            "Use [X] to pick up",
-            "You move slower while carrying Boxes");
+        if (!this.checkBox) {
+            this.makeText(2*this.platWidth,150-this.promptOffset,260,90,1,1,
+                "Use [X] to pick up boxes",
+                "and take them to shelves",
+                "You move slower while carrying boxes"
+            );
+            this.checkBox = true;
         }
         if (!player.hasBox && Phaser.Input.Keyboard.JustDown(keyINTERACT)) {
             player.hasBox = true;
             this.finish -= 1;
             box.destroy();
         }
-        this.checkBox = true;
     }
 
     playerShelving(player, shelf) { //will not work if player is moving (bug or feature?)
-        if(!this.checkShelf){
+        if (!this.checkShelf) {
             this.makeText(50+this.promptOffset, 150+3*this.platDist-this.promptOffset,165,90,0,1,//check
                 "Bring Boxes here",
                 "Use [X] to shelve Boxes",
-                "It takes a little time to do");
-            }
+                "It takes a little time to do"
+            );
+            this.checkShelf = true;
+        }
         if(player.hasBox && Phaser.Input.Keyboard.JustDown(keyINTERACT)){
             player.hasBox = false;
             player.isShelve = true;
@@ -594,13 +504,15 @@ class Tutorial extends Phaser.Scene {
     }
 
     playerCleaning(player, mess){
-        if(!this.checkMess){
+        if (!this.checkMess) {
             this.makeText(50+2*this.platWidth, 150+this.platDist-this.promptOffset,220,90,0,1,//check
                 "Clean up Messes you encounter",
                 "Use [X] to clean",
-                "Cleaning takes time");
-            }
-        if(Phaser.Input.Keyboard.JustDown(keyINTERACT)){
+                "Cleaning takes time"
+            );
+            this.checkMess = true;
+        }
+        if (Phaser.Input.Keyboard.JustDown(keyINTERACT)) {
             player.isMop = true;
             let timer = this.time.delayedCall(750, () => { //flag balance
                 player.isMop = false;
@@ -611,20 +523,19 @@ class Tutorial extends Phaser.Scene {
     }
 
     playerBumping(player, customer){
-        if(!this.checkCust){
+
+        if (!this.checkCust) {
             this.finish -= 1;
             this.makeText(3*this.platWidth-this.promptOffset, 150+2*this.platDist-this.promptOffset,225,90,1,1,//check
                 "Customers peruse the isles",
                 "Make sure to not bump into them",
-                "or they will get angry");
-        } 
-        this.checkCust = true;
-        this.spawnAngryCustomer(customer.x,customer.y);
-        customer.destroy();
-        // creep ooze down
-      /*  if (!this.gameOverBot) {
-            this.oozeCreep();
-        } //turn on if you want ooze to move when customer is bumped*/ //check
+                "or they will get angry"
+            );
+            this.checkCust = true;
+            this.spawnAngryCustomer(customer.x,customer.y);
+            customer.destroy();
+        }
+
     }
 
     /******************************
@@ -778,6 +689,7 @@ class Tutorial extends Phaser.Scene {
    
     }
 
+    // smart
     makeText(x,y,width,height,originX,originY,line1,line2,line3){
         let back = this.add.rectangle (
             x, y, width, height, 0x000000

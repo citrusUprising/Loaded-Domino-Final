@@ -45,6 +45,9 @@ class Play extends Phaser.Scene {
         //speed of scrolling
         this.scroll = 1;
 
+        // selector babeyy
+        this.selected = "restart";
+
         // multiplier applied to platform scrolling speed
         this.platMod = -80;  
 
@@ -431,13 +434,15 @@ class Play extends Phaser.Scene {
                 this.bgm.volume = 0.2*game.settings.musicVolume;
 
                 // text spacer for game over text
+                // kludge
+                this.textSpacer = 60;
                 let textSpacer = 60;
 
                 // create game over text
                 // note 2 cam from cam: clean this up, remove magic #s -love, cam
                 this.add.rectangle (
                     game.config.width/2, game.config.height/2,
-                    500, 360, 0x000000
+                    500, 400, 0x000000
                 ).setOrigin(0.5);
                 
                 this.add.text (
@@ -445,22 +450,36 @@ class Play extends Phaser.Scene {
                     "Game Over", this.gameOverHeaderConfig
                 ).setOrigin(0.5);
                 
+                // because im fuckinge crazie
+                let secs;
+                if (this.finScore == 1) {
+                    secs = " second";
+                } else {
+                    secs = " seconds";
+                }
+
                 this.add.text (
                     game.config.width/2, game.config.height/2,
-                    "after only " + this.finScore + " seconds at work",
+                    "after only " + this.finScore + secs + " at work",
                     this.gameOverInfoConfig
                 ).setOrigin(0.5);
 
                 this.add.text (
-                    game.config.width/2, game.config.height/2+textSpacer,
-                    "Press ↑ to try again", this.gameOverInstructionsConfig
-                ).setOrigin(0.5);
+                    game.config.width/2-80, game.config.height/2+textSpacer,
+                    "Try again", this.gameOverInstructionsConfig
+                )
 
                 this.add.text (
-                    game.config.width/2, game.config.height/2+2*textSpacer,
-                    "Press ↓ to return to menu", this.gameOverInstructionsConfig
-                ).setOrigin(0.5);
+                    game.config.width/2-80, game.config.height/2+2*textSpacer,
+                    "Return to menu", this.gameOverInstructionsConfig
+                );
     
+                // add selector
+                this.selectorText = this.add.text (
+                    game.config.width/2-120, game.config.height/2+textSpacer,
+                    "•", this.gameOverInstructionsConfig
+                );
+
                 if (this.gameoverTop) {
 
                     this.add.text (
@@ -491,17 +510,37 @@ class Play extends Phaser.Scene {
         // else, if player's dead
         } else {
 
-            // reset scene on player input
+            // handle menu
             if (Phaser.Input.Keyboard.JustDown(keyUP)) {
-                this.bgm.volume =.6*game.settings.musicVolume;
-                this.scene.restart();           
+                switch (this.selected) {
+                    case "menu":
+                        this.selected = "restart";
+                        this.selectorText.y -= this.textSpacer;
+                        break;
+                }
             }
-
-            // exit to menu on player input
+    
             if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
-                game.settings.playing = false;
-                this.bgm.stop();
-                this.scene.start("menuScene");
+                switch (this.selected) {
+                    case "restart":
+                        this.selected = "menu";
+                        this.selectorText.y += this.textSpacer;
+                        break;
+                }
+            }
+    
+            if (Phaser.Input.Keyboard.JustDown(keyJUMP)) {
+                switch (this.selected) {
+                    case "restart":
+                        this.bgm.volume =.6*game.settings.musicVolume;
+                        this.scene.restart();
+                        break;
+                    case "menu":
+                        game.settings.playing = false;
+                        this.bgm.stop();
+                        this.scene.start("menuScene");
+                        break;
+                }
             }
 
         } 

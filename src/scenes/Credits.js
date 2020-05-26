@@ -89,26 +89,27 @@ class Credits extends Phaser.Scene {
 
         this.add.text (
             centerX, centerY+5*textSpacer, 
-            '← Menu   → Start Shift', menuConfig
+            'Press [X] to return to menu', menuConfig
         ).setOrigin(0.5);
 
-        keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
-        keyRIGHT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.RIGHT);
+        keyBACK = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.X);
 
     }
 
     update() {
 
-            //left returns to menu
-            if(Phaser.Input.Keyboard.JustDown(keyLEFT)) {
+            //back returns to menu
+            if(Phaser.Input.Keyboard.JustDown(keyBACK)) {
                 this.scene.start("menuScene");
             }
+            /*
             //right starts game
             if(Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
                 game.settings.bgm.stop();
                 game.settings.tutorOpen = false;
                 this.scene.start("playScene");
             }
+            */
         
     }
 }
