@@ -15,11 +15,14 @@ class Play extends Phaser.Scene {
         // load sprite atlas
         this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
 
+        // load void atlas
+        this.load.atlas("void", "assets/voidSheet.png", "assets/voidJson.json");
+
         // load void spritesheet
-        this.load.spritesheet("void", "assets/voidtest.png", {
-            frameWidth: 1280, frameHeight: 150,
-            startFrame: 0, endFrame: 29
-        });
+        //this.load.spritesheet("void", "assets/voidtest.png", {
+        //    frameWidth: 1280, frameHeight: 150,
+        //    startFrame: 0, endFrame: 29
+        //});
         
     }
 
@@ -122,7 +125,12 @@ class Play extends Phaser.Scene {
         this.anims.create({
             key: "voidAnim",
             repeat: -1,
-            frames: this.anims.generateFrameNumbers("void", { start: 0, end: 29, first: 0}),
+            frames: this.anims.generateFrameNames("void", {
+				prefix: "void",
+				start: 0,
+				end: 29,
+                zeroPad: 0
+            }),
             frameRate: 30
         });
         
