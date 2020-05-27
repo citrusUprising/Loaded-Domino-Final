@@ -6,10 +6,12 @@ class Tutorial extends Phaser.Scene {
     
     preload() {
 
+        /*
         this.load.image("backDrop", "assets/ware.png");
         this.load.image("voidStatic", "assets/voidStatic.png");
 
         this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
+        */
         
     }
 

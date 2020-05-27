@@ -700,6 +700,8 @@ class Play extends Phaser.Scene {
     //  makes the ooze creep down the screen an amount determined by
     //  game.settings.oozeSpeed and game.settings.oozeDrop
     oozeCreep() {
+        // shake screen?
+        //this.sound.play("oops", {volume: 0.4*game.settings.effectVolume});
         this.ooze.body.setVelocityY(game.settings.oozeSpeed);
         let timer = this.time.delayedCall(game.settings.oozeDrop, this.stopOoze, [], this);
     }

@@ -6,6 +6,7 @@ class Menu extends Phaser.Scene {
     
     preload() {
 
+        /*
         // load title screen image
         this.load.image('titleInit', 'assets/titleInit.png')
         this.load.spritesheet("title", "assets/titleScroll.png", {
@@ -21,7 +22,8 @@ class Menu extends Phaser.Scene {
 		this.load.audio("sfxJump", ["assets/sfx/jump.mp3", "assets/sfx/jump.ogg"]);
 		this.load.audio("sfxFall", ["assets/sfx/fall.mp3", "assets/sfx/fall.ogg"]);
 		this.load.audio("sfxPlatform", ["assets/sfx/platform.mp3", "assets/sfx/platform.ogg"]);
-		this.load.audio("sfxConsume", ["assets/sfx/consume.mp3", "assets/sfx/consume.ogg"]);
+        this.load.audio("sfxConsume", ["assets/sfx/consume.mp3", "assets/sfx/consume.ogg"]);
+        */
 
     }
     
