@@ -76,7 +76,6 @@ class Player extends Phaser.GameObjects.Sprite {
             }
 
         }
-                
 
         /*
         // limit speed to this.maxSpeed

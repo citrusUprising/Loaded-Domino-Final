@@ -3,30 +3,7 @@ class Menu extends Phaser.Scene {
     constructor() {
         super("menuScene");
     }
-    
-    preload() {
 
-        /*
-        // load title screen image
-        this.load.image('titleInit', 'assets/titleInit.png')
-        this.load.spritesheet("title", "assets/titleScroll.png", {
-            frameWidth: 1280, frameHeight :720,
-            startFrame: 0, endFrame: 2
-        });
-
-        // load music
-        this.load.audio('menuMusic', 'assets/bgm/OnMyWay.mp3');
-        this.load.audio('gameMusic', 'assets/bgm/TheShowMustBeGo.mp3');
-
-        // load sfx
-		this.load.audio("sfxJump", ["assets/sfx/jump.mp3", "assets/sfx/jump.ogg"]);
-		this.load.audio("sfxFall", ["assets/sfx/fall.mp3", "assets/sfx/fall.ogg"]);
-		this.load.audio("sfxPlatform", ["assets/sfx/platform.mp3", "assets/sfx/platform.ogg"]);
-        this.load.audio("sfxConsume", ["assets/sfx/consume.mp3", "assets/sfx/consume.ogg"]);
-        */
-
-    }
-    
     create() {
 
         // menu cursor location
@@ -135,14 +112,17 @@ class Menu extends Phaser.Scene {
                 case "tutorial":
                     this.selected = "play";
                     this.selectorText.y -= this.textSpacer;
+                    this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                     break;
                 case "settings":
                     this.selected = "tutorial";
                     this.selectorText.y -= this.textSpacer;
+                    this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                     break;
                 case "credits":
                     this.selected = "settings";
                     this.selectorText.y -= this.textSpacer;
+                    this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                     break;
             }
         }
@@ -152,14 +132,17 @@ class Menu extends Phaser.Scene {
                 case "play":
                     this.selected = "tutorial";
                     this.selectorText.y += this.textSpacer;
+                    this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                     break;
                 case "tutorial":
                     this.selected = "settings";
                     this.selectorText.y += this.textSpacer;
+                    this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                     break;
                 case "settings":
                     this.selected = "credits";
                     this.selectorText.y += this.textSpacer;
+                    this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                     break;
             }
         }

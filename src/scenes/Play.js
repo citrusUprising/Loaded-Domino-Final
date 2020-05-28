@@ -3,28 +3,6 @@ class Play extends Phaser.Scene {
     constructor() {
         super("playScene");
     }
-    
-    preload() {
-
-		// load temp images
-		//this.load.image("player", "assets/char.png");
-        //this.load.image("platform", "assets/rampsmall.png");
-        this.load.image("backDrop", "assets/ware.png");
-        this.load.image("voidStatic", "assets/voidStatic.png");
-
-        // load sprite atlas
-        this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
-
-        // load void atlas
-        this.load.atlas("void", "assets/voidSheet.png", "assets/voidJson.json");
-
-        // load void spritesheet
-        //this.load.spritesheet("void", "assets/voidtest.png", {
-        //    frameWidth: 1280, frameHeight: 150,
-        //    startFrame: 0, endFrame: 29
-        //});
-        
-    }
 
     create() {
 
@@ -388,6 +366,15 @@ class Play extends Phaser.Scene {
                 this.player.isTurn = false;
             }
 
+            // face angry customers
+            this.agCustomers.children.each(function(agCustomer) {
+                if (agCustomer.x < this.player.x) {
+                    agCustomer.setFlipX(false);
+                } else {
+                    agCustomer.setFlipX(true);
+                }
+            }, this);
+
             // check if player died
             // give player some leeway so they don't get eaten by particles
             if (this.player.y < this.ooze.y-80) {
@@ -529,6 +516,7 @@ class Play extends Phaser.Scene {
                     case "menu":
                         this.selected = "restart";
                         this.selectorText.y -= this.textSpacer;
+                        this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                         break;
                 }
             }
@@ -538,6 +526,7 @@ class Play extends Phaser.Scene {
                     case "restart":
                         this.selected = "menu";
                         this.selectorText.y += this.textSpacer;
+                        this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});                this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                         break;
                 }
             }
@@ -701,7 +690,7 @@ class Play extends Phaser.Scene {
     //  game.settings.oozeSpeed and game.settings.oozeDrop
     oozeCreep() {
         // shake screen?
-        //this.sound.play("oops", {volume: 0.4*game.settings.effectVolume});
+        this.sound.play("sfxOops", {volume: 0.2*game.settings.effectVolume});
         this.ooze.body.setVelocityY(game.settings.oozeSpeed);
         let timer = this.time.delayedCall(game.settings.oozeDrop, this.stopOoze, [], this);
     }
@@ -736,6 +725,7 @@ class Play extends Phaser.Scene {
         if(player.hasBox && Phaser.Input.Keyboard.JustDown(keyINTERACT)){
             player.hasBox = false;
             player.isShelve = true;
+            this.sound.play("sfxShelf", {volume: 0.4*game.settings.effectVolume});
             let timer = this.time.delayedCall(500, () => { //flag balance
                 player.isShelve = false;
                 //spawn full shelf sprite
@@ -749,6 +739,7 @@ class Play extends Phaser.Scene {
     playerCleaning(player, mess){
         if(Phaser.Input.Keyboard.JustDown(keyINTERACT)){
             player.isMop = true;
+            this.sound.play("sfxClean", {volume: 0.4*game.settings.effectVolume});
             let timer = this.time.delayedCall(750, () => { //flag balance
                 player.isMop = false;
                 mess.destroy();

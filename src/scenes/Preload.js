@@ -32,8 +32,12 @@ class Preload extends Phaser.Scene {
         // load sfx
 		this.load.audio("sfxJump", ["assets/sfx/jump.mp3", "assets/sfx/jump.ogg"]);
 		this.load.audio("sfxFall", ["assets/sfx/fall.mp3", "assets/sfx/fall.ogg"]);
-		this.load.audio("sfxPlatform", ["assets/sfx/platform.mp3", "assets/sfx/platform.ogg"]);
-        this.load.audio("sfxConsume", ["assets/sfx/consume.mp3", "assets/sfx/consume.ogg"]);
+		this.load.audio("sfxConsume", ["assets/sfx/consume.mp3", "assets/sfx/consume.ogg"]);
+        this.load.audio("sfxOops", ["assets/sfx/oops.mp3", "assets/sfx/oops.ogg"]);
+        this.load.audio("sfxShelf", ["assets/sfx/shelving.mp3", "assets/sfx/shelving.ogg"]);
+        this.load.audio("sfxStep", ["assets/sfx/step.mp3", "assets/sfx/step.ogg"]);
+        this.load.audio("sfxClean", ["assets/sfx/clean.mp3", "assets/sfx/clean.ogg"]);
+        this.load.audio("sfxUIClick", ["assets/sfx/ui-click.mp3", "assets/sfx/ui-click.ogg"]);
 
     }
     

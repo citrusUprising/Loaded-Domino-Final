@@ -424,6 +424,7 @@ class Tutorial extends Phaser.Scene {
                     case "menu":
                         this.selected = "play";
                         this.selectorText.y -= this.textSpacer;
+                        this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                         break;
                 }
             }
@@ -433,6 +434,7 @@ class Tutorial extends Phaser.Scene {
                     case "play":
                         this.selected = "menu";
                         this.selectorText.y += this.textSpacer;
+                        this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                         break;
                 }
             }
