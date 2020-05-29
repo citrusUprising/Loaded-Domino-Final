@@ -5,6 +5,77 @@ class Preload extends Phaser.Scene {
     }
     
     preload() {
+        //loading bar variables
+        var width = game.config.width;
+        var height = game.config.height;
+
+        //loading box and text
+        //code provided by Scott Westover on GameDevAcademy
+        //https://gamedevacademy.org/creating-a-preloading-screen-in-phaser-3/
+        var progressBar = this.add.graphics();
+        var progressBox = this.add.graphics();
+        progressBox.fillStyle(0xfacade, 0.8);
+        progressBox.fillRect((width/2)-450,(height/2)-25,900,50);
+
+        var loadingText = this.make.text({
+            x: width/2,
+            y: height/2 - 50,
+            text: 'Loading...',
+            style: {
+                font: '20px monospace',
+                fill: '#facade'
+            }
+        });
+        loadingText.setOrigin(0.5);
+
+        var percentText = this.make.text({
+            x: width/2,
+            y: height/2,
+            text: '0%',
+            style:{
+                font: '18px monospace',
+                fill: '#222222'
+            }
+        });
+        percentText.setOrigin(0.5);
+
+        var flavorText = this.make.text({
+            x: width/2,
+            y: height/2 + 50,
+            text: 'Now Hiring!',
+            style: {
+                font: '18px monospace',
+                fill: '#facade'
+            }
+        });
+        flavorText.setOrigin(0.5);
+
+        //loading listeners
+        //code provided by Scott Westover on GameDevAcademy
+        //https://gamedevacademy.org/creating-a-preloading-screen-in-phaser-3/
+        this.load.on('progress', function (value) {
+            console.log(value);
+
+            percentText.setText(parseInt(value*100)+'%');
+            progressBar.clear();
+            progressBar.fillStyle(0xfacade, 1);
+            progressBar.fillRect((width/2)-440,(height/2)-15,880*value,30);
+
+            if(value<.25)flavorText.setText('Reading resumes');
+            else if(value<.5)flavorText.setText('Conducting interviews');
+            else if(value<.75)flavorText.setText('Balancing checkbook');
+            else if(value<1)flavorText.setText('Firing employees');
+            else flavorText.setText('Finalizing work schedule');//check
+        });
+
+
+        this.load.on('comeplete', function () {
+            console.log('comeplete');
+            progressBar.destroy();
+            progressBox.destroy();
+            percentText.destroy();
+            flavorText.destroy();
+        });
 
         // load title screen image
         this.load.image('titleInit', 'assets/titleInit.png')
