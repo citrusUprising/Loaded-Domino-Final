@@ -38,10 +38,16 @@ class Play extends Phaser.Scene {
         //platform generation
         this.xL = 0;
         this.xR = game.config.width;
+        this.platNum = 2;//check
 
         //separate gameover variables depending on death
         this.gameoverTop = false;
         this.gameoverBot = false;
+
+        //item spawning chances
+        this.itemDrop = 10; //check
+        this.itemPlus = 5; //check
+        this.itemMax = 50; //check
 
         /****************
          * text configs *
@@ -265,7 +271,7 @@ class Play extends Phaser.Scene {
          * add ooze *
          ************/
 
-        this.ooze = new Ooze(this, 0, -40, "voidStatic", 0).setOrigin(0, 0.33);
+        this.ooze = new Ooze(this, 0, -100, "voidStatic", 0).setOrigin(0, 0.33);
         this.physics.add.existing(this.ooze);
         this.ooze.body.allowGravity = false;
         this.ooze.body.immovable = true;
@@ -563,7 +569,7 @@ class Play extends Phaser.Scene {
 
         // clean up platforms
         this.platforms.children.each(function(platform) {
-            if (platform.y < -platform.height) {
+            if (platform.y < this.ooze.y-platform.height) {
                 platform.destroy();
             }
         }, this);
@@ -636,11 +642,12 @@ class Play extends Phaser.Scene {
             // update scoreBoard
             this.scoreBoard.setText(this.score);
         
-            if ((this.scroll < 2) && (this.score%20 == 0) && (this.score > 0)) {
+            if ((this.score%5 == 0) && (this.score > 0)) {
+                if(this.scroll < 2){
                 
                 // make scrolling + spawning a little faster
-                this.scroll += 0.2;
-                this.platformTimer.timeScale = 1 + (0.2*this.scroll);
+                this.scroll += 0.1;
+                this.platformTimer.timeScale = 1 + (0.3*this.scroll);
 
                 //scale player jump to platform speed
                 this.player.jumpHeight -= 15; // 90 is = to this.scroll*jumpheight //flag may need balancing
@@ -675,9 +682,51 @@ class Play extends Phaser.Scene {
                 this.agCustomers.getChildren().forEach(function (agCustomer) {
                     agCustomer.body.velocity.y = this.scroll*this.platMod;
                 }, this);
+
+                } 
+                else if(this.itemDrop<this.itemMax)this.itemDrop += this.itemPlus;
+
+                else if (this.score >= 180){
+                    // make scrolling + spawning a little faster
+                    this.scroll += 0.05;
+                    this.platformTimer.timeScale = 1 + (0.2*this.scroll);
+
+                    //scale player jump to platform speed
+                    this.player.jumpHeight -= 15; // 90 is = to this.scroll*jumpheight //flag may need balancing
+                
+                    //update speed of existing platforms and objects
+                    //code provided by Ben Rosien in the discord channel
             
+                    this.platforms.getChildren().forEach(function (platform) {
+                        platform.body.velocity.y = this.scroll*this.platMod;
+                    }, this);
+
+                    this.boxes.getChildren().forEach(function (box) {
+                        box.body.velocity.y = this.scroll*this.platMod;
+                    }, this);
+
+                    this.shelves.getChildren().forEach(function (shelf) {
+                        shelf.body.velocity.y = this.scroll*this.platMod;
+                    }, this);
+
+                    this.fullShelves.getChildren().forEach(function (fullShelf) {
+                        fullShelf.body.velocity.y = this.scroll*this.platMod;
+                    }, this);
+
+                    this.messes.getChildren().forEach(function (mess) {
+                        mess.body.velocity.y = this.scroll*this.platMod;
+                    }, this);
+
+                    this.customers.getChildren().forEach(function (customer) {
+                        customer.body.velocity.y = this.scroll*this.platMod;
+                    }, this);
+
+                    this.agCustomers.getChildren().forEach(function (agCustomer) {
+                        agCustomer.body.velocity.y = this.scroll*this.platMod;
+                    }, this);
+
+                }  
             }
-    
         }
     }
 
@@ -764,36 +813,36 @@ class Play extends Phaser.Scene {
     //  spawn platform randomly at bottom of screen
     makePlatform() {
 
-        let sx = Phaser.Math.RND.between(this.xL, this.xR);
-        this.xL = sx-(game.config.width*.5); //flag (*2/3) in 540p
-        if (this.xL < -25)this.xL = 0;
-        this.xR = sx+(game.config.width*.5); //flag (*2/3) in 540p
-        if (this.xR > game.config.width+25)this.xR = game.config.width;
-        //console.log(sx);
+        var i;
+        for (i = 0; i < this.platNum; i++) {
+            let sx = Phaser.Math.RND.between(this.xL, this.xR);
+            this.xL = sx-(game.config.width*.5); //flag (*2/3) in 540p
+            if (this.xL < -25)this.xL = 0;
+            this.xR = sx+(game.config.width*.5); //flag (*2/3) in 540p
+            if (this.xR > game.config.width+25)this.xR = game.config.width;
+            //console.log(sx);
 
-        let platform = this.platforms.create(sx, game.config.height+150, "sprites", "rampsmall");
+            let platform = this.platforms.create(sx, game.config.height+150, "sprites", "rampsmall");
 
-        platform.setScale(1);
-        platform.body.allowGravity = false;
-        platform.body.immovable = true;
-        platform.body.velocity.y = this.platMod*this.scroll;
-        platform.body.checkCollision.left = false;
-        platform.body.checkCollision.right = false;
-        platform.body.checkCollision.down = false;
-        platform.setFrictionX(1);
-        platform.setDepth(this.PLATFORM_DEPTH);
+            platform.setScale(1);
+            platform.body.allowGravity = false;
+            platform.body.immovable = true;
+            platform.body.velocity.y = this.    platMod*this.scroll;
+            platform.body.checkCollision.left = false;
+            platform.body.checkCollision.right = false;
+            platform.body.checkCollision.down = false;
+            platform.setFrictionX(1);
+            platform.setDepth(this.PLATFORM_DEPTH);
 
-        // 30% chance of spawning box / shelf
-        let objectChance = 30; //remember to make this 30 again  //check
+            let spawnRoll = Phaser.Math.RND.between(0, 100);
 
-        let spawnRoll = Phaser.Math.RND.between(0, 100);
-
-        // runs code to determine what object is spawned
-        if (spawnRoll <= objectChance) {
-            let xRandom = Phaser.Math.RND.between(sx-100, sx+100); // flag make sure number is <= (platform width-largest object width)/2
-            if (xRandom < 50) xRandom = 50;
-            if (xRandom > game.config.width-50) xRandom = game.config.width-50;
-            this.spawnObject(xRandom, game.config.height+150-(platform.height/2));
+            // runs code to determine what object is spawned
+            if (spawnRoll <= this.itemDrop) {
+                let xRandom = Phaser.Math.RND.between(sx-100, sx+100); // flag make sure number is <= (platform width-largest object width)/2
+                if (xRandom < 50) xRandom = 50;
+                if (xRandom > game.config.width-50) xRandom = game.config.width-50;
+                this.spawnObject(xRandom, game.config.height+150-(platform.height/2));
+            }
         }
     }
 
