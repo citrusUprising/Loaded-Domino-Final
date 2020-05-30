@@ -25,6 +25,7 @@ class Play extends Phaser.Scene {
 
         //speed of scrolling
         this.scroll = 1;
+        this.bonusTime = 180; //determines when speed starts increasing past x2
 
         // selector babeyy
         this.selected = "restart";
@@ -686,7 +687,7 @@ class Play extends Phaser.Scene {
                 } 
                 else if(this.itemDrop<this.itemMax)this.itemDrop += this.itemPlus;
 
-                else if (this.score >= 180){
+                else if (this.score >= this.bonusTime){
                     // make scrolling + spawning a little faster
                     this.scroll += 0.05;
                     this.platformTimer.timeScale = 1 + (0.2*this.scroll);
