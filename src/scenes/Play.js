@@ -25,7 +25,10 @@ class Play extends Phaser.Scene {
 
         //speed of scrolling
         this.scroll = 1;
-        this.bonusTime = 180; //determines when speed starts increasing past x2
+        this.diffCheck = 5; //how often speed/item rate is increased //check
+        this.speedUp = .1; //how much speed goes up per increase //check
+        this.speedCapInit = 2; //the highest speed can be before bonusTime //check
+        this.bonusTime = 180; //determines when speed starts increasing past x2 //check
 
         // selector babeyy
         this.selected = "restart";
@@ -643,11 +646,11 @@ class Play extends Phaser.Scene {
             // update scoreBoard
             this.scoreBoard.setText(this.score);
         
-            if ((this.score%5 == 0) && (this.score > 0)) {
-                if(this.scroll < 2){
+            if ((this.score%this.diffCheck == 0) && (this.score > 0)) {
+                if(this.scroll < this.speedCapInit){
                 
                 // make scrolling + spawning a little faster
-                this.scroll += 0.1;
+                this.scroll += this.speedUp;
                 this.platformTimer.timeScale = 1 + (0.3*this.scroll);
 
                 //scale player jump to platform speed
@@ -689,7 +692,7 @@ class Play extends Phaser.Scene {
 
                 else if (this.score >= this.bonusTime){
                     // make scrolling + spawning a little faster
-                    this.scroll += 0.05;
+                    this.scroll += this.speedUp/2;
                     this.platformTimer.timeScale = 1 + (0.2*this.scroll);
 
                     //scale player jump to platform speed
