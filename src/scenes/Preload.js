@@ -56,10 +56,10 @@ class Preload extends Phaser.Scene {
         this.load.on('progress', function (value) {
             console.log(value);
 
-            percentText.setText(parseInt(value*100)+'%');
+            percentText.setText(parseInt(value*100)-1+'%');
             progressBar.clear();
             progressBar.fillStyle(0xfacade, 1);
-            progressBar.fillRect((width/2)-440,(height/2)-15,880*value,30);
+            progressBar.fillRect((width/2)-440,(height/2)-15,(880*value)-1,30);
 
             if(value<.25)flavorText.setText('Reading resumes');
             else if(value<.5)flavorText.setText('Conducting interviews');
