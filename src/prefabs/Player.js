@@ -9,6 +9,7 @@ class Player extends Phaser.GameObjects.Sprite {
         // save scene in var so we can reference it
         this.scene = scene;
 
+        this.speedCap = 300;
         this.speed = 300;
         this.jumpHeight = -450;
         this.hasBox = false;
@@ -53,9 +54,9 @@ class Player extends Phaser.GameObjects.Sprite {
             if (this.isShelve || this.isMop) {
                 this.speed = 0;
             } else if (this.hasBox) {
-                this.speed = 250;
+                this.speed = this.speedCap*(3/4);
             } else {
-                this.speed = 300;
+                this.speed = this.speedCap;
             }
 
         } else {

@@ -231,11 +231,11 @@ class Tutorial extends Phaser.Scene {
             loop: true
         });
 
-        /**********************************************************
-         * setup world bounds with vertical pockets for game over *
-         **********************************************************/
+        /**********************
+         * setup world bounds *
+         **********************/
 
-        this.physics.world.setBounds(0, -100, game.config.width, game.config.height+200);
+        this.physics.world.setBounds(0, 0, game.config.width, game.config.height+200);
 
         /**************************
          * add warehouse backdrop *
@@ -349,9 +349,9 @@ class Tutorial extends Phaser.Scene {
             if(this.player.y<150){
                 if(this.player.x<2*this.platWidth+100&&this.player.x>2*this.platWidth-100&&!this.checkBox){
                         this.makeText(2*this.platWidth,150-this.promptOffset,260,90,1,1,
-                            "Use [X] to pick up boxes",
-                            "and take them to shelves",
-                            "You move slower while carrying boxes"
+                            "Use [X] to pick up Boxes",
+                            "and take them to Shelves",
+                            "you move slower while carrying Boxes"
                         );
                         this.checkBox = true;
                 }
@@ -361,7 +361,7 @@ class Tutorial extends Phaser.Scene {
                 if(this.player.x<150&&this.player.x>-50&&!this.checkShelf){
                     this.makeText(50+this.promptOffset, 150+3*this.platDist-this.promptOffset,165,90,0,1,//check
                         "Bring Boxes here",
-                        "Use [X] to shelve Boxes",
+                        "use [X] to shelve Boxes",
                         "It takes a little time to do"
                     );
                     this.checkShelf = true;
@@ -372,8 +372,8 @@ class Tutorial extends Phaser.Scene {
                 if(this.player.x<50+2*this.platWidth+100&&this.player.x>50+2*this.platWidth-100&&!this.checkMess){
                     this.makeText(50+2*this.platWidth, 150+this.platDist-this.promptOffset,220,90,0,1,//check
                         "Clean up Messes you encounter",
-                        "Use [X] to clean",
-                        "Cleaning takes time"
+                        "use [X] to clean",
+                        "cleaning takes time"
                     );
                     this.checkMess = true;
                 }
@@ -543,7 +543,7 @@ class Tutorial extends Phaser.Scene {
             this.finish -= 1;
             this.makeText(3*this.platWidth-this.promptOffset, 150+2*this.platDist-this.promptOffset,225,90,1,1,//check
                 "Customers peruse the isles",
-                "Make sure to not bump into them",
+                "make sure to not bump into them",
                 "or they will get angry"
             );
             this.checkCust = true;
