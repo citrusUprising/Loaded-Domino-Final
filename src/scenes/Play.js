@@ -25,10 +25,10 @@ class Play extends Phaser.Scene {
 
         //speed of scrolling
         this.scroll = 1;
-        this.diffCheck = 5; //how often speed/item rate is increased //check
+        this.diffCheck = 10; //how often speed/item rate is increased //check
         this.speedUp = .1; //how much speed goes up per increase //check
         this.speedCapInit = 2; //the highest speed can be before bonusTime //check
-        this.bonusTime = 180; //determines when speed starts increasing past x2 //check
+        this.bonusTime = 300; //determines when speed starts increasing past x2 //check
 
         // selector babeyy
         this.selected = "restart";
@@ -50,7 +50,7 @@ class Play extends Phaser.Scene {
 
         //item spawning chances
         this.itemDrop = 10; //check
-        this.itemPlus = 5; //check
+        this.itemPlus = 10; //check
         this.itemMax = 50; //check
 
         /****************
@@ -624,7 +624,7 @@ class Play extends Phaser.Scene {
         // clean up angry customers
         this.agCustomers.children.each(function(agCustomer) {
             if (agCustomer.y < this.ooze.y-agCustomer.height) {
-                if (!this.gameOverBot && !this.gameOverBot) {
+                if (!this.gameoverBot && !this.gameoverBot) {
                     agCustomer.destroy();
                 }
                 //turn on if you want ooze to move when customer hits top of screen
@@ -638,7 +638,7 @@ class Play extends Phaser.Scene {
     //  increase score every second
     scoreUp() {
         
-        if (!this.gameOverBot && !this.gameOverTop) {
+        if (!this.gameoverBot && !this.gameoverTop) {
         
             // increment score
             this.score++;
@@ -647,14 +647,18 @@ class Play extends Phaser.Scene {
             this.scoreBoard.setText(this.score);
         
             if ((this.score%this.diffCheck == 0) && (this.score > 0)) {
-                if(this.scroll < this.speedCapInit){
+                 
+                if(this.itemDrop<this.itemMax)this.itemDrop += this.itemPlus;
+
+                else if(this.scroll < this.speedCapInit){
                 
                 // make scrolling + spawning a little faster
                 this.scroll += this.speedUp;
                 this.platformTimer.timeScale = 1 + (0.3*this.scroll);
 
-                //scale player jump to platform speed
+                //scale player jump and move to platform speed
                 this.player.jumpHeight -= 15; // 90 is = to this.scroll*jumpheight //flag may need balancing
+                this.player.speedCap += 50*this.speedUp//check
                 
                 //update speed of existing platforms and objects
                 //code provided by Ben Rosien in the discord channel
@@ -687,8 +691,7 @@ class Play extends Phaser.Scene {
                     agCustomer.body.velocity.y = this.scroll*this.platMod;
                 }, this);
 
-                } 
-                else if(this.itemDrop<this.itemMax)this.itemDrop += this.itemPlus;
+                }
 
                 else if (this.score >= this.bonusTime){
                     // make scrolling + spawning a little faster
@@ -697,6 +700,7 @@ class Play extends Phaser.Scene {
 
                     //scale player jump to platform speed
                     this.player.jumpHeight -= 15; // 90 is = to this.scroll*jumpheight //flag may need balancing
+                    this.player.speedCap += 50*this.speedUp//check
                 
                     //update speed of existing platforms and objects
                     //code provided by Ben Rosien in the discord channel
@@ -804,7 +808,7 @@ class Play extends Phaser.Scene {
         this.spawnAngryCustomer(customer.x,customer.y);
         customer.destroy();
         // creep ooze down
-        if (!this.gameOverTop && !this.gameOverBot) {
+        if (!this.gameoverTop && !this.gameoverBot) {
             this.oozeCreep();
         } //turn on if you want ooze to move when customer is bumped
     }
