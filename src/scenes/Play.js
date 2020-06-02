@@ -43,6 +43,7 @@ class Play extends Phaser.Scene {
         this.xL = 0;
         this.xR = game.config.width;
         this.platNum = 2;//check
+        this.platWidth = 320;
 
         //separate gameover variables depending on death
         this.gameoverTop = false;
@@ -822,8 +823,13 @@ class Play extends Phaser.Scene {
     makePlatform() {
 
         var i;
+        var sx;
         for (i = 0; i < this.platNum; i++) {
-            let sx = Phaser.Math.RND.between(this.xL, this.xR);
+            let sx2 = Phaser.Math.RND.between(this.xL, this.xR);
+            if(sx == null) sx = sx2;
+            else if (sx < sx2-this.platWidth&& sx > sx2-(this.platWidth+this.player.width+10)) sx = sx2 - this.player.width;
+            else if(sx > sx2+this.platWidth&& sx < sx2+(this.platWidth+this.player.width+10)) sx = sx2 + this.player.width;
+            else sx = sx2;
             this.xL = sx-(game.config.width*.5); //flag (*2/3) in 540p
             if (this.xL < -25)this.xL = 0;
             this.xR = sx+(game.config.width*.5); //flag (*2/3) in 540p
