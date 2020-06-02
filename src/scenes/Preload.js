@@ -77,12 +77,9 @@ class Preload extends Phaser.Scene {
             flavorText.destroy();
         });
 
-        // load title screen image
-        this.load.image('titleInit', 'assets/titleInit.png')
-        this.load.spritesheet("title", "assets/titleScroll.png", {
-            frameWidth: 1280, frameHeight :720,
-            startFrame: 0, endFrame: 2
-        });
+        // load menu images
+        this.load.image('title', 'assets/loose/main.png');
+        this.load.image('settingsBack','assets/loose/settings.png');
 
         // load game backdrop
         this.load.image("backDrop", "assets/ware.png");

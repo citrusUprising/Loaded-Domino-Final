@@ -42,6 +42,7 @@ game.settings = {
 	oozeDrop: 1000,
 	tutorOpen: false,
 	playing: false,
+	trained: false, //reorganizes menu depending on if tutorial was played
 	bgm: null,
 	musicVolume: 0.5,
 	effectVolume: 0.5,

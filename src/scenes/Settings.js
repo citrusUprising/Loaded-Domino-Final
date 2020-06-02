@@ -10,13 +10,14 @@ class Settings extends Phaser.Scene {
 
     create() {
 
+        this.backdrop = this.add.sprite(0, 0, "settingsBack").setOrigin(0,0);
+
         this.volSelect = true;
 
         let menuConfig = {
             fontFamily: 'Helvetica',
             fontSize: '30px',
-            backgroundColor: '#000000',
-            color: '#e81e40',
+            color: '#e7d97d',
             align: 'center',
             padding: {
                 top: 10,
@@ -30,7 +31,7 @@ class Settings extends Phaser.Scene {
         let textSpacer = 40;
 
         this.add.text (
-            centerX, centerY-5*textSpacer, 
+            centerX, centerY-3*textSpacer, 
             'Settings', menuConfig
         ).setOrigin(0.5);
 
@@ -52,12 +53,12 @@ class Settings extends Phaser.Scene {
             '← and → to toggle setting, ↑ and ↓ to change', menuConfig
         ).setOrigin(0.5);
 
-        menuConfig.color = '#de7183';
+        menuConfig.color = '#e7d97d';
 
         this.add.text (
             centerX, centerY+5*textSpacer, 
             'Press [X] to return to menu', menuConfig
-        ).setOrigin(0.5);
+        ).setOrigin(0,0.5);
 
         this.initHeight = 260;
         this.musBar = this.add.rectangle(centerX*.75, centerY+2.5*textSpacer, 3*textSpacer, this.initHeight, 0xfacade).setOrigin(0.5, 1);
@@ -79,15 +80,15 @@ class Settings extends Phaser.Scene {
             this.sfxBar.setScale(1, game.settings.effectVolume);
         
             if(this.volSelect){
-                this.musBar.fillColor = 0xf71669;
-                this.musText.setFill('#f71669');
+                this.musBar.fillColor = 0xffe605;
+                this.musText.setFill('#ffe605');
                 this.sfxBar.fillColor = 0xfacade;
                 this.sfxText.setFill('#facade');
             }else{
                 this.musBar.fillColor = 0xfacade;
                 this.musText.setFill('#facade');
-                this.sfxBar.fillColor = 0xf71669;
-                this.sfxText.setFill('#f71669');
+                this.sfxBar.fillColor = 0xffe605;
+                this.sfxText.setFill('#ffe605');
             }
         }
 
