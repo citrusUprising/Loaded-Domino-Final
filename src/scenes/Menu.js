@@ -95,6 +95,26 @@ class Menu extends Phaser.Scene {
             ' • ', menuConfig
         )
 
+        //add legend
+
+        menuConfig.fontSize = '25px';
+        menuConfig.color = '#e7d97d';
+
+        this.add.text(
+            centerX/3, centerY - (4/2)*this.textSpacer,
+            'Use ↑ and ↓', menuConfig
+        )
+
+        this.add.text(
+            centerX/3, centerY - (3/2)*this.textSpacer,
+            'to navigate the menu', menuConfig
+        )
+
+        this.add.text(
+            centerX/3, centerY - (2/2)*this.textSpacer,
+            'and [Z] to select', menuConfig
+        )
+
 
         // titlescreen keyboard controls
         keyLEFT = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.LEFT);
