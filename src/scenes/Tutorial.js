@@ -515,6 +515,7 @@ class Tutorial extends Phaser.Scene {
         if(player.hasBox && Phaser.Input.Keyboard.JustDown(keyINTERACT)){
             player.hasBox = false;
             player.isShelve = true;
+            this.sound.play("sfxShelf", {volume: 0.4*game.settings.effectVolume});
             let timer = this.time.delayedCall(500, () => { //flag balance
                 player.isShelve = false;
                 //spawn full shelf sprite
@@ -529,6 +530,7 @@ class Tutorial extends Phaser.Scene {
     playerCleaning(player, mess){
         if (Phaser.Input.Keyboard.JustDown(keyINTERACT)) {
             player.isMop = true;
+            this.sound.play("sfxClean", {volume: 0.4*game.settings.effectVolume});
             let timer = this.time.delayedCall(750, () => { //flag balance
                 player.isMop = false;
                 this.finish -= 1;
@@ -547,6 +549,7 @@ class Tutorial extends Phaser.Scene {
                 "or they will get angry"
             );
             this.checkCust = true;
+            this.sound.play("sfxOops", {volume: 0.2*game.settings.effectVolume});
             this.spawnAngryCustomer(customer.x,customer.y);
             customer.destroy();
         }

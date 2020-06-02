@@ -536,7 +536,7 @@ class Play extends Phaser.Scene {
                     case "restart":
                         this.selected = "menu";
                         this.selectorText.y += this.textSpacer;
-                        this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});                this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
+                        this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                         break;
                 }
             }
@@ -590,7 +590,7 @@ class Play extends Phaser.Scene {
             if (shelf.y < this.ooze.y-shelf.height) {
                 shelf.destroy();
                 // creep ooze down
-                if (!this.gameoverTop) {//flag
+                if (!this.gameoverTop&&!this.gameoverBot) {//flag
                     this.oozeCreep();
                 } else console.log('ooze continues')
             }
@@ -608,7 +608,7 @@ class Play extends Phaser.Scene {
             if (mess.y < this.ooze.y-mess.height) {
                 mess.destroy();
                 // creep ooze down
-                if (!this.gameoverTop) {//flag
+                if (!this.gameoverTop&&!this.gameoverBot) {//flag
                     this.oozeCreep();
                 } else console.log('ooze continues')
             }
