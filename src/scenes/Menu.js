@@ -29,7 +29,7 @@ class Menu extends Phaser.Scene {
         // menu text config
         let menuConfig = {
             fontFamily: 'Helvetica',
-            fontSize: '30px',
+            fontSize: '40px',
             align: 'left',
             backgroundColor: '#000000',
             color: '#de7183',
@@ -41,10 +41,10 @@ class Menu extends Phaser.Scene {
         }
 
         //Location markers and text spacing
-        let centerX = game.config.width/2 - 120;
+        let centerX = game.config.width/2 + 40;
         let centerY = game.config.height/2;
         
-        this.textSpacer = 80;
+        this.textSpacer = 90;
 
         // add titlecard sprite
         /*this.titleCard = this.add.tileSprite (
@@ -59,39 +59,39 @@ class Menu extends Phaser.Scene {
         
         if(!game.settings.trained){
             this.add.text (
-                centerX, centerY, 
+                centerX, centerY-this.textSpacer, 
                 'Training', menuConfig
             )
 
             this.add.text (
-                centerX, centerY+this.textSpacer, 
+                centerX, centerY, 
                 'Clock In', menuConfig
             )
         }else{
             this.add.text (
-                centerX, centerY, 
+                centerX, centerY-this.textSpacer, 
                 'Clock In', menuConfig
             )
     
             this.add.text (
-                centerX, centerY+this.textSpacer, 
+                centerX, centerY, 
                 'Training', menuConfig
             )
         }
 
         this.add.text (
-            centerX, centerY+2*this.textSpacer, 
+            centerX, centerY+this.textSpacer, 
             'Settings', menuConfig
         ) 
 
         this.add.text (
-            centerX, centerY+3*this.textSpacer, 
+            centerX, centerY+2*this.textSpacer, 
             "Credits", menuConfig
         )
         
         // add selector
         this.selectorText = this.add.text (
-            centerX-40, centerY, 
+            centerX-40, centerY-this.textSpacer, 
             ' • ', menuConfig
         )
 
