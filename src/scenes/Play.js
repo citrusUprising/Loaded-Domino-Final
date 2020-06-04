@@ -25,10 +25,10 @@ class Play extends Phaser.Scene {
 
         //speed of scrolling
         this.scroll = 1;
-        this.diffCheck = 10; //how often speed/item rate is increased //check
-        this.speedUp = .1; //how much speed goes up per increase //check
-        this.speedCapInit = 2; //the highest speed can be before bonusTime //check
-        this.bonusTime = 300; //determines when speed starts increasing past x2 //check
+        this.diffCheck = 10; //how often speed/item rate is increased //check (10)
+        this.speedUp = .1; //how much speed goes up per increase //check (.1)
+        this.speedCapInit = 2; //the highest speed can be before bonusTime //check (2)
+        this.bonusTime = 300; //determines when speed starts increasing past x2 //check (300)
 
         // selector babeyy
         this.selected = "restart";
@@ -42,7 +42,7 @@ class Play extends Phaser.Scene {
         //platform generation
         this.xL = 0;
         this.xR = game.config.width;
-        this.platNum = 2;//check
+        this.platNum = 2;//check (2)
         this.platWidth = 320;
 
         //separate gameover variables depending on death
@@ -50,9 +50,9 @@ class Play extends Phaser.Scene {
         this.gameoverBot = false;
 
         //item spawning chances
-        this.itemDrop = 100; //check (10)
-        this.itemPlus = 0; //check (10)
-        this.itemMax = 100; //check (50)
+        this.itemDrop = 10; //check (10)
+        this.itemPlus = 10; //check (10)
+        this.itemMax = 50; //check (50)
 
         /****************
          * text configs *
@@ -879,8 +879,8 @@ class Play extends Phaser.Scene {
     spawnObject(x, y) {
 
         //needs an order
-        let topBound = 102; //check set to 67
-        let bottomBound = 101; //check set to 34
+        let topBound = 67; //check set to 67
+        let bottomBound = 34; //check set to 34
 
         let xRandom = Phaser.Math.RND.between(x-100, x+100); 
                 if (xRandom < 50) xRandom = 50;
@@ -982,7 +982,8 @@ class Play extends Phaser.Scene {
     }
 
     spawnCustomer(x, y) {
-        let customer = new Customer (this, x-100, y, "sprites", "customerIdle").setOrigin(0.5,1);
+        let spawnX = x -((this.platWidth/2)-20)
+        let customer = new Customer (this, spawnX, y, "sprites", "customerIdle").setOrigin(0.5,1);
         this.physics.add.existing(customer); //flag
         this.customers.add(customer);
         //let customer = this.customers.create(x, y, "sprites", "customerIdle");

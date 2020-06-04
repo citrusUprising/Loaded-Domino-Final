@@ -11,7 +11,7 @@ class Customer extends Phaser.GameObjects.Sprite {
 
         //this.anims.play("customerWalk", true);
         this.isFlipped = false;
-        this.run = 4000; //the duration a customer walks in one direction
+        this.run = 5500; //the duration a customer walks in one direction
 
             this.turnTimer = this.scene.time.addEvent ({
                 delay: this.run,
