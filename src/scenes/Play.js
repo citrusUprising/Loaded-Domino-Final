@@ -50,9 +50,9 @@ class Play extends Phaser.Scene {
         this.gameoverBot = false;
 
         //item spawning chances
-        this.itemDrop = 10; //check
-        this.itemPlus = 10; //check
-        this.itemMax = 50; //check
+        this.itemDrop = 100; //check (10)
+        this.itemPlus = 0; //check (10)
+        this.itemMax = 100; //check (50)
 
         /****************
          * text configs *
@@ -215,6 +215,18 @@ class Play extends Phaser.Scene {
             repeat: 0
         }); 
 
+        /*this.anim.create({
+            key: 'customerWalk',
+            frames: this.anims.generateFrameNames("sprites", {
+                prefix: "customerWalk", //flag
+                start: 1,
+                end: ??,
+                zeroPad: 0
+            }),
+            framerate: ??,
+            repeat: -1
+        });*/
+
         /*****************
          * set up timers *
          *****************/
@@ -319,7 +331,8 @@ class Play extends Phaser.Scene {
         this.shelves = this.physics.add.group();
         this.fullShelves = this.physics.add.group();
         this.messes = this.physics.add.group();
-        this.customers = this.physics.add.group();
+        //this.customers = this.physics.add.group(); //flag
+        this.customers = new Phaser.GameObjects.Group (this); //flag
         this.agCustomers = this.physics.add.group();
 
         this.physics.add.collider(this.player, this.platforms, this.playerHitPlatform, null, this);
@@ -356,6 +369,11 @@ class Play extends Phaser.Scene {
     }
 
     update(time, delta) {
+
+        //update customers
+        this.customers.children.each(function(customer) {
+            customer.update();
+        }, this); //flag
        
         // if player hasn't died yet
         if (!this.gameoverTop && !this.gameoverBot) {
@@ -406,6 +424,7 @@ class Play extends Phaser.Scene {
 
                 // stop *everything*
                 this.platformTimer.paused = true;
+                this.scroll = 0; //flag
 
                 this.platforms.children.each(function(platform) {
                     platform.body.velocity.y = 0;
@@ -427,9 +446,9 @@ class Play extends Phaser.Scene {
                     mess.body.velocity.y = 0;
                 }, this);
 
-                this.customers.children.each(function(customer) {
+                /*this.customers.children.each(function(customer) {
                     customer.body.velocity.y = 0;
-                }, this);
+                }, this);*/ //flag
 
                 this.agCustomers.children.each(function(agCustomer) {
                     agCustomer.body.velocity.y = 0;
@@ -616,11 +635,11 @@ class Play extends Phaser.Scene {
         }, this);
 
         // clean up customers
-        this.customers.children.each(function(customer) {
+        /*this.customers.children.each(function(customer) {
             if (customer.y < this.ooze.y-customer.height) {
                 customer.destroy();
             }
-        }, this);
+        }, this);*/ //flag
 
         // clean up angry customers
         this.agCustomers.children.each(function(agCustomer) {
@@ -684,9 +703,9 @@ class Play extends Phaser.Scene {
                     mess.body.velocity.y = this.scroll*this.platMod;
                 }, this);
 
-                this.customers.getChildren().forEach(function (customer) {
+                /*this.customers.getChildren().forEach(function (customer) {
                     customer.body.velocity.y = this.scroll*this.platMod;
-                }, this);
+                }, this);*/ //flag
 
                 this.agCustomers.getChildren().forEach(function (agCustomer) {
                     agCustomer.body.velocity.y = this.scroll*this.platMod;
@@ -726,9 +745,9 @@ class Play extends Phaser.Scene {
                         mess.body.velocity.y = this.scroll*this.platMod;
                     }, this);
 
-                    this.customers.getChildren().forEach(function (customer) {
+                    /*this.customers.getChildren().forEach(function (customer) {
                         customer.body.velocity.y = this.scroll*this.platMod;
-                    }, this);
+                    }, this);*/ //flag
 
                     this.agCustomers.getChildren().forEach(function (agCustomer) {
                         agCustomer.body.velocity.y = this.scroll*this.platMod;
@@ -852,10 +871,7 @@ class Play extends Phaser.Scene {
 
             // runs code to determine what object is spawned
             if (spawnRoll <= this.itemDrop) {
-                let xRandom = Phaser.Math.RND.between(sx-100, sx+100); // flag make sure number is <= (platform width-largest object width)/2
-                if (xRandom < 50) xRandom = 50;
-                if (xRandom > game.config.width-50) xRandom = game.config.width-50;
-                this.spawnObject(xRandom, game.config.height+150-(platform.height/2));
+                this.spawnObject(sx, game.config.height+150-(platform.height/2));
             }
         }
     }
@@ -863,26 +879,30 @@ class Play extends Phaser.Scene {
     spawnObject(x, y) {
 
         //needs an order
-        let topBound = 67; //check set to 67
-        let bottomBound = 34; //check set to 34
+        let topBound = 102; //check set to 67
+        let bottomBound = 101; //check set to 34
+
+        let xRandom = Phaser.Math.RND.between(x-100, x+100); 
+                if (xRandom < 50) xRandom = 50;
+                if (xRandom > game.config.width-50) xRandom = game.config.width-50;
 
         let typeRoll = Phaser.Math.RND.between(1, 100); //change to 1, 3
 
         if (typeRoll<=topBound && typeRoll>=bottomBound) {
             if (!this.madeBox) {
                 if (!this.player.hasBox) {
-                    this.spawnBox(x, y);
+                    this.spawnBox(xRandom, y);
                     this.madeBox = true;
                 } else {
                     this.madeBox = true;
                 }
             } else {
-                this.spawnShelf(x, y); 
+                this.spawnShelf(xRandom, y); 
                 this.madeBox = false;
             }
-        } else if (typeRoll >= topBound) {
-            this.spawnMess(x, y);
-        } else if (typeRoll <= bottomBound){ 
+        } else if (typeRoll > topBound) {
+            this.spawnMess(xRandom, y);
+        } else if (typeRoll < bottomBound){ 
             this.spawnCustomer(x, y);
         }
         
@@ -962,15 +982,16 @@ class Play extends Phaser.Scene {
     }
 
     spawnCustomer(x, y) {
-
-        let customer = this.customers.create(x, y, "sprites", "customerIdle");
+        let customer = new Customer (this, x-100, y, "sprites", "customerIdle").setOrigin(0.5,1);
+        this.physics.add.existing(customer); //flag
+        this.customers.add(customer);
+        //let customer = this.customers.create(x, y, "sprites", "customerIdle");
 
         customer.setScale(1);
-        customer.setOrigin(.5,1);
         customer.body.allowGravity = false;
         customer.body.immovable = true;
         customer.body.velocity.y = this.platMod*this.scroll;
-        customer.setFrictionX(1);
+        customer.body.velocity.x = 0; //check
         customer.setDepth(this.CUSTOMER_DEPTH);
 
     }
