@@ -15,7 +15,7 @@ class Settings extends Phaser.Scene {
         this.volSelect = true;
 
         let menuConfig = {
-            fontFamily: 'Helvetica',
+            fontFamily: 'Chelsea Market',
             fontSize: '30px',
             color: '#e7d97d',
             align: 'center',

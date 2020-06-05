@@ -63,7 +63,7 @@ class Tutorial extends Phaser.Scene {
          ****************/
 
         this.scoreBoardConfig = {
-            fontFamily: 'Helvetica',
+            fontFamily: 'Chelsea Market',
             fontSize: '30px',
             backgroundColor: '#000000',
             color: '#facade',
@@ -76,7 +76,7 @@ class Tutorial extends Phaser.Scene {
         }
 
         this.gameOverHeaderConfig = {
-            fontFamily: 'Helvetica',
+            fontFamily: 'Chelsea Market',
             fontSize: '50px',
             color: '#fbe33c',
             align: 'center',
@@ -88,7 +88,7 @@ class Tutorial extends Phaser.Scene {
         }
 
         this.gameOverInfoConfig = {
-            fontFamily: 'Helvetica',
+            fontFamily: 'Chelsea Market',
             fontSize: '30px',
             color: '#facade',
             align: 'center',
@@ -100,7 +100,7 @@ class Tutorial extends Phaser.Scene {
         }
 
         this.gameOverInstructionsConfig = {
-            fontFamily: 'Helvetica',
+            fontFamily: 'Chelsea Market',
             fontSize: '30px',
             color: '#e7d97d',
             align: 'center',
@@ -112,7 +112,7 @@ class Tutorial extends Phaser.Scene {
         }
 
         this.instructionConfig = {
-            fontFamily: 'Helvetica',
+            fontFamily: 'Chelsea Market',
             fontSize: '15px',
             color: '#e7d97d',
             align: 'center',

@@ -13,7 +13,7 @@ class Credits extends Phaser.Scene {
         this.backdrop = this.add.sprite(0, 0, "settingsBack").setOrigin(0,0);
 
         let menuConfig = {
-            fontFamily: 'Helvetica',
+            fontFamily: 'Chelsea Market',
             fontSize: '30px',
             color: '#e7d97d',
             align: 'center',
