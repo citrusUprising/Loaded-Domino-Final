@@ -88,7 +88,7 @@ class Preload extends Phaser.Scene {
         this.load.atlas("sprites", "assets/spritesheet.png", "assets/sprites.json");
 
         // load static void image
-        this.load.image("voidStatic", "assets/voidStatic.png");
+        this.load.image("voidStatic", "assets/voidStatic.png");//check
 
         // load void atlas
         this.load.atlas("void", "assets/voidSheet.png", "assets/voidJson.json");
