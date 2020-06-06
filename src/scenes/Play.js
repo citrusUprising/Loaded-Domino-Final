@@ -61,7 +61,6 @@ class Play extends Phaser.Scene {
         this.scoreBoardConfig = {
             fontFamily: 'Chelsea Market',
             fontSize: '30px',
-            backgroundColor: '#000000',
             color: '#facade',
             align: 'center',
             padding: {
@@ -302,7 +301,9 @@ class Play extends Phaser.Scene {
          * add scoreboard *
          ******************/
 
+        this.scoreBack = this.makeBlackboard(0,0,100,65,0);
         this.scoreBoard = this.add.text(0, 0, this.score, this.scoreBoardConfig);
+
 
         /***************
          * start music *
@@ -454,9 +455,6 @@ class Play extends Phaser.Scene {
                     agCustomer.body.velocity.y = 0;
                 }, this);
 
-                // hide scoreboard
-                this.scoreBoard.setVisible(false);
-
                 // final score
                 this.finScore = this.score;
 
@@ -470,10 +468,16 @@ class Play extends Phaser.Scene {
 
                 // create game over text
                 // note 2 cam from cam: clean this up, remove magic #s -love, cam
-                this.add.rectangle (
-                    game.config.width/2, game.config.height/2,
-                    500, 400, 0x000000
-                ).setOrigin(0.5);
+                if(this.gameoverTop){
+                    this.add.rectangle (
+                        game.config.width/2, game.config.height/2,
+                        500, 400, 0x000000
+                    ).setOrigin(0.5);
+                }else{
+                    this.makeBlackboard(
+                        game.config.width/2, game.config.height/2,
+                        500,400,.5);
+                }
                 
                 this.add.text (
                     game.config.width/2, (game.config.height/2)-(2*textSpacer),
@@ -505,10 +509,9 @@ class Play extends Phaser.Scene {
                 );
     
                 // add selector
-                this.selectorText = this.add.text (
-                    game.config.width/2-120, game.config.height/2+textSpacer,
-                    "•", this.gameOverInstructionsConfig
-                );
+                this.selectorText = this.add.sprite (
+                    game.config.width/2-90, game.config.height/2+textSpacer, 
+                    "selector").setOrigin(1,0);
 
                 if (this.gameoverTop) {
 
@@ -1016,4 +1019,98 @@ class Play extends Phaser.Scene {
    
     }
 
+    makeBlackboard(inX,inY,length, height, xO,yO){
+        if (yO ==null) yO=xO;
+        let x = inX-(xO*length);
+        let y = inY-(yO*height);
+
+        this.add.sprite(x,y,'chalkboard','boardCC')
+        .setOrigin(0,0)
+        .setScale(length/70,height/70);
+
+    if(height>=140&&length>=140){
+        this.add.sprite(x,y,'chalkboard','boardTL')
+        .setOrigin(0);
+        this.add.sprite(x+length,y,'chalkboard','boardTR')
+        .setOrigin(1,0);
+        this.add.sprite(x,y+height,'chalkboard','boardBL')
+        .setOrigin(0,1);
+        this.add.sprite(x+length,y+height,'chalkboard','boardBR')
+        .setOrigin(1);
+    }else if(height>=140){
+        this.add.sprite(x,y,'chalkboard','boardTL')
+        .setOrigin(0)
+        .setScale(length/140,1);
+        this.add.sprite(x+length,y,'chalkboard','boardTR')
+        .setOrigin(1,0)
+        .setScale(length/140,1);
+        this.add.sprite(x,y+height,'chalkboard','boardBL')
+        .setOrigin(0,1)
+        .setScale(length/140,1);
+        this.add.sprite(x+length,y+height,'chalkboard','boardBR')
+        .setOrigin(1)
+        .setScale(length/140,1);
+    }else if(length>=140){
+        this.add.sprite(x,y,'chalkboard','boardTL')
+        .setOrigin(0)
+        .setScale(1,height/140);
+        this.add.sprite(x+length,y,'chalkboard','boardTR')
+        .setOrigin(1,0)
+        .setScale(1,height/140);
+        this.add.sprite(x,y+height,'chalkboard','boardBL')
+        .setOrigin(0,1)
+        .setScale(1,height/140);
+        this.add.sprite(x+length,y+height,'chalkboard','boardBR')
+        .setOrigin(1)
+        .setScale(1,height/140);
+    } else{
+        this.add.sprite(x,y,'chalkboard','boardTL')
+        .setOrigin(0)
+        .setScale(length/140,height/140);
+        this.add.sprite(x+length,y,'chalkboard','boardTR')
+        .setOrigin(1,0)
+        .setScale(length/140,height/140);
+        this.add.sprite(x,y+height,'chalkboard','boardBL')
+        .setOrigin(0,1)
+        .setScale(length/140,height/140);
+        this.add.sprite(x+length,y+height,'chalkboard','boardBR')
+        .setOrigin(1)
+        .setScale(length/140,height/140);
+    }
+
+    if(height>140){
+        if(length<140){
+            this.add.sprite(x,y+70,'chalkboard','boardCL')
+            .setOrigin(0)
+            .setScale(length/140,(height-140)/70);
+            this.add.sprite(x+length,y+70,'chalkboard','boardCR')
+            .setOrigin(1,0)
+            .setScale(length/140,(height-140)/70);
+        }else{
+            this.add.sprite(x,y+70,'chalkboard','boardCL')
+            .setOrigin(0)
+            .setScale(1,(height-140)/70);
+            this.add.sprite(x+length,y+70,'chalkboard','boardCR')
+            .setOrigin(1,0)
+            .setScale(1,(height-140)/70);
+        }
+    }
+    if(length>140){
+        if(height<140){
+            this.add.sprite(x+70,y,'chalkboard','boardTC')
+            .setOrigin(0)
+            .setScale((length-140)/70,height/140);
+            this.add.sprite(x+70,y+height,'chalkboard','boardBC')
+            .setOrigin(0,1)
+            .setScale((length-140)/70,height/140);
+        }else{
+            this.add.sprite(x+70,y,'chalkboard','boardTC')
+            .setOrigin(0)
+            .setScale((length-140)/70,1);
+            this.add.sprite(x+70,y+height,'chalkboard','boardBC')
+            .setOrigin(0,1)
+            .setScale((length-140)/70,1);
+        }
+    }
+    }
 }

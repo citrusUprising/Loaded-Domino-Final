@@ -320,7 +320,7 @@ class Tutorial extends Phaser.Scene {
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
 
-        this.makeText(game.config.width-100-this.promptOffset, 50+this.promptOffset,140,90,1,1,
+        this.makeText(game.config.width-100-this.promptOffset, 50+this.promptOffset,170,90,1,1,
             "Welcome to work!",
             "Move with ← and →",
             "Use [Z] to jump"
@@ -348,7 +348,7 @@ class Tutorial extends Phaser.Scene {
             //box
             if(this.player.y<150){
                 if(this.player.x<2*this.platWidth+100&&this.player.x>2*this.platWidth-100&&!this.checkBox){
-                        this.makeText(2*this.platWidth,150-this.promptOffset,260,90,1,1,
+                        this.makeText(2*this.platWidth,150-this.promptOffset,310,90,1,1,
                             "Use [X] to pick up Boxes",
                             "and take them to Shelves",
                             "you move slower while carrying Boxes"
@@ -359,7 +359,7 @@ class Tutorial extends Phaser.Scene {
             //shelf
             if(this.player.y<150+3*this.platDist&&this.player.y>3*this.platDist-50){
                 if(this.player.x<150&&this.player.x>-50&&!this.checkShelf){
-                    this.makeText(50+this.promptOffset, 150+3*this.platDist-this.promptOffset,165,90,0,1,//check
+                    this.makeText(50+this.promptOffset, 150+3*this.platDist-this.promptOffset,215,90,0,1,//check
                         "Bring Boxes here",
                         "use [X] to shelve Boxes",
                         "It takes a little time to do"
@@ -370,7 +370,7 @@ class Tutorial extends Phaser.Scene {
             //mess
             if(this.player.y<150+this.platDist&&this.player.y>this.platDist){
                 if(this.player.x<50+2*this.platWidth+100&&this.player.x>50+2*this.platWidth-100&&!this.checkMess){
-                    this.makeText(50+2*this.platWidth, 150+this.platDist-this.promptOffset,220,90,0,1,//check
+                    this.makeText(50+2*this.platWidth, 150+this.platDist-this.promptOffset,260,90,0,1,//check
                         "Clean up Messes you encounter",
                         "use [X] to clean",
                         "cleaning takes time"
@@ -409,10 +409,10 @@ class Tutorial extends Phaser.Scene {
 
                 // create game over text
                 // note 2 cam from cam: clean this up, remove magic #s -love, cam
-                this.add.rectangle (
+                this.makeBlackboard (
                     game.config.width/2, game.config.height/2,
-                    500, 360, 0x000000
-                ).setOrigin(0.5);
+                    500, 360, 0, .5
+                );
                 
                 // this is a really funny way to do this
                 this.add.text (
@@ -443,10 +443,9 @@ class Tutorial extends Phaser.Scene {
                 );
    
                 // add selector
-                this.selectorText = this.add.text (
-                    game.config.width/2-120, game.config.height/2+textSpacer,
-                    "•", this.gameOverInstructionsConfig
-                );
+                this.selectorText = this.add.sprite (
+                    game.config.width/2-90, game.config.height/2+textSpacer, 
+                    "selector").setOrigin(1,0);
                 
             }
     
@@ -543,7 +542,7 @@ class Tutorial extends Phaser.Scene {
 
         if (!this.checkCust) {
             this.finish -= 1;
-            this.makeText(3*this.platWidth-this.promptOffset, 150+2*this.platDist-this.promptOffset,225,90,1,1,//check
+            this.makeText(3*this.platWidth-this.promptOffset, 150+2*this.platDist-this.promptOffset, 275,90,1,1,//check
                 "Customers peruse the isles",
                 "make sure to not bump into them",
                 "or they will get angry"
@@ -709,9 +708,7 @@ class Tutorial extends Phaser.Scene {
 
     // smart
     makeText(x,y,width,height,originX,originY,line1,line2,line3){
-        let back = this.add.rectangle (
-            x, y, width, height, 0x000000
-        ).setOrigin(originX, originY).setDepth(this.TEXTBACK_DEPTH);
+        this.makeBlackboard(x,y,width,height,this.TEXT_DEPTH, originX, originY);
         
         let textX = x;
         if(originX == 1)textX = x-5;
@@ -730,6 +727,126 @@ class Tutorial extends Phaser.Scene {
             textX, y,
             line3, this.instructionConfig
         ).setOrigin(originX, originY).setDepth(this.TEXT_DEPTH);
+    }
+
+    makeBlackboard(inX,inY,length, height, depth, xO, yO){
+        if (yO ==null) yO=xO;
+        let x = inX-(xO*length);
+        let y = inY-(yO*height);
+
+        this.add.sprite(x,y,'chalkboard','boardCC')
+        .setOrigin(0,0)
+        .setScale(length/70,height/70)
+        .setDepth(depth);
+
+    if(height>=140&&length>=140){
+        this.add.sprite(x,y,'chalkboard','boardTL')
+        .setOrigin(0)
+        .setDepth(depth);
+        this.add.sprite(x+length,y,'chalkboard','boardTR')
+        .setOrigin(1,0)
+        .setDepth(depth);
+        this.add.sprite(x,y+height,'chalkboard','boardBL')
+        .setOrigin(0,1)
+        .setDepth(depth);
+        this.add.sprite(x+length,y+height,'chalkboard','boardBR')
+        .setOrigin(1)
+        .setDepth(depth);
+    }else if(height>=140){
+        this.add.sprite(x,y,'chalkboard','boardTL')
+        .setOrigin(0)
+        .setScale(length/140,1)
+        .setDepth(depth);
+        this.add.sprite(x+length,y,'chalkboard','boardTR')
+        .setOrigin(1,0)
+        .setScale(length/140,1)
+        .setDepth(depth);
+        this.add.sprite(x,y+height,'chalkboard','boardBL')
+        .setOrigin(0,1)
+        .setScale(length/140,1)
+        .setDepth(depth);
+        this.add.sprite(x+length,y+height,'chalkboard','boardBR')
+        .setOrigin(1)
+        .setScale(length/140,1)
+        .setDepth(depth);
+    }else if(length>=140){
+        this.add.sprite(x,y,'chalkboard','boardTL')
+        .setOrigin(0)
+        .setScale(1,height/140)
+        .setDepth(depth);
+        this.add.sprite(x+length,y,'chalkboard','boardTR')
+        .setOrigin(1,0)
+        .setScale(1,height/140)
+        .setDepth(depth);
+        this.add.sprite(x,y+height,'chalkboard','boardBL')
+        .setOrigin(0,1)
+        .setScale(1,height/140)
+        .setDepth(depth);
+        this.add.sprite(x+length,y+height,'chalkboard','boardBR')
+        .setOrigin(1)
+        .setScale(1,height/140)
+        .setDepth(depth);
+    } else{
+        this.add.sprite(x,y,'chalkboard','boardTL')
+        .setOrigin(0)
+        .setScale(length/140,height/140)
+        .setDepth(depth);
+        this.add.sprite(x+length,y,'chalkboard','boardTR')
+        .setOrigin(1,0)
+        .setScale(length/140,height/140)
+        .setDepth(depth);
+        this.add.sprite(x,y+height,'chalkboard','boardBL')
+        .setOrigin(0,1)
+        .setScale(length/140,height/140)
+        .setDepth(depth);
+        this.add.sprite(x+length,y+height,'chalkboard','boardBR')
+        .setOrigin(1)
+        .setScale(length/140,height/140)
+        .setDepth(depth);
+    }
+
+    if(height>140){
+        if(length<140){
+            this.add.sprite(x,y+70,'chalkboard','boardCL')
+            .setOrigin(0)
+            .setScale(length/140,(height-140)/70)
+            .setDepth(depth);
+            this.add.sprite(x+length,y+70,'chalkboard','boardCR')
+            .setOrigin(1,0)
+            .setScale(length/140,(height-140)/70)
+            .setDepth(depth);
+        }else{
+            this.add.sprite(x,y+70,'chalkboard','boardCL')
+            .setOrigin(0)
+            .setScale(1,(height-140)/70)
+            .setDepth(depth);
+            this.add.sprite(x+length,y+70,'chalkboard','boardCR')
+            .setOrigin(1,0)
+            .setScale(1,(height-140)/70)
+            .setDepth(depth);
+        }
+    }
+    if(length>140){
+        if(height<140){
+            this.add.sprite(x+70,y,'chalkboard','boardTC')
+            .setOrigin(0)
+            .setScale((length-140)/70,height/140)
+            .setDepth(depth);
+            this.add.sprite(x+70,y+height,'chalkboard','boardBC')
+            .setOrigin(0,1)
+            .setScale((length-140)/70,height/140)
+            .setDepth(depth);
+        }else{
+            this.add.sprite(x+70,y,'chalkboard','boardTC')
+            .setOrigin(0)
+            .setScale((length-140)/70,1)
+            .setDepth(depth);
+            this.add.sprite(x+70,y+height,'chalkboard','boardBC')
+            .setOrigin(0,1)
+            .setScale((length-140)/70,1)
+            .setDepth(depth);
+        }
+    }
     }
 
 }

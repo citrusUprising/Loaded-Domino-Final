@@ -31,8 +31,7 @@ class Menu extends Phaser.Scene {
             fontFamily: 'Chelsea Market',
             fontSize: '40px',
             align: 'left',
-            backgroundColor: '#000000',
-            color: '#de7183',
+            color: '#ffffff',
             padding: {
                 top: 10,
                 bottom: 10,
@@ -54,6 +53,9 @@ class Menu extends Phaser.Scene {
 
        /* this.add.text(centerX, centerY-2*textSpacer, 
             'SHELVING CRISIS', titleConfig).setOrigin(0.5);*/
+
+        //add menu backdrops
+        this.makeBlackboard(centerX-95,centerY-this.textSpacer,265,325,0);
 
         // add titlescreen text
         
@@ -90,10 +92,9 @@ class Menu extends Phaser.Scene {
         )
         
         // add selector
-        this.selectorText = this.add.text (
-            centerX-40, centerY-this.textSpacer, 
-            ' • ', menuConfig
-        )
+        this.selectorText = this.add.sprite (
+            centerX-45, centerY-this.textSpacer, 
+            "selector").setOrigin(.5,0);
 
         //add legend
 
@@ -265,5 +266,100 @@ class Menu extends Phaser.Scene {
         }
         */
 
+    }
+
+    makeBlackboard(inX,inY,length, height, xO,yO){
+        if (yO ==null) yO=xO;
+        let x = inX-(xO*length);
+        let y = inY-(yO*height);
+        
+            this.add.sprite(x,y,'chalkboard','boardCC')
+            .setOrigin(0)
+            .setScale(length/70,height/70);
+
+        if(height>=140&&length>=140){
+            this.add.sprite(x,y,'chalkboard','boardTL')
+            .setOrigin(0);
+            this.add.sprite(x+length,y,'chalkboard','boardTR')
+            .setOrigin(1,0);
+            this.add.sprite(x,y+height,'chalkboard','boardBL')
+            .setOrigin(0,1);
+            this.add.sprite(x+length,y+height,'chalkboard','boardBR')
+            .setOrigin(1);
+        }else if(height>=140){
+            this.add.sprite(x,y,'chalkboard','boardTL')
+            .setOrigin(0)
+            .setScale(length/140,1);
+            this.add.sprite(x+length,y,'chalkboard','boardTR')
+            .setOrigin(1,0)
+            .setScale(length/140,1);
+            this.add.sprite(x,y+height,'chalkboard','boardBL')
+            .setOrigin(0,1)
+            .setScale(length/140,1);
+            this.add.sprite(x+length,y+height,'chalkboard','boardBR')
+            .setOrigin(1)
+            .setScale(length/140,1);
+        }else if(length>=140){
+            this.add.sprite(x,y,'chalkboard','boardTL')
+            .setOrigin(0)
+            .setScale(1,height/140);
+            this.add.sprite(x+length,y,'chalkboard','boardTR')
+            .setOrigin(1,0)
+            .setScale(1,height/140);
+            this.add.sprite(x,y+height,'chalkboard','boardBL')
+            .setOrigin(0,1)
+            .setScale(1,height/140);
+            this.add.sprite(x+length,y+height,'chalkboard','boardBR')
+            .setOrigin(1)
+            .setScale(1,height/140);
+        } else{
+            this.add.sprite(x,y,'chalkboard','boardTL')
+            .setOrigin(0)
+            .setScale(length/140,height/140);
+            this.add.sprite(x+length,y,'chalkboard','boardTR')
+            .setOrigin(1,0)
+            .setScale(length/140,height/140);
+            this.add.sprite(x,y+height,'chalkboard','boardBL')
+            .setOrigin(0,1)
+            .setScale(length/140,height/140);
+            this.add.sprite(x+length,y+height,'chalkboard','boardBR')
+            .setOrigin(1)
+            .setScale(length/140,height/140);
+        }
+
+        if(height>140){
+            if(length<140){
+                this.add.sprite(x,y+70,'chalkboard','boardCL')
+                .setOrigin(0)
+                .setScale(length/140,(height-140)/70);
+                this.add.sprite(x+length,y+70,'chalkboard','boardCR')
+                .setOrigin(1,0)
+                .setScale(length/140,(height-140)/70);
+            }else{
+                this.add.sprite(x,y+70,'chalkboard','boardCL')
+                .setOrigin(0)
+                .setScale(1,(height-140)/70);
+                this.add.sprite(x+length,y+70,'chalkboard','boardCR')
+                .setOrigin(1,0)
+                .setScale(1,(height-140)/70);
+            }
+        }
+        if(length>140){
+            if(height<140){
+                this.add.sprite(x+70,y,'chalkboard','boardTC')
+                .setOrigin(0)
+                .setScale((length-140)/70,height/140);
+                this.add.sprite(x+70,y+height,'chalkboard','boardBC')
+                .setOrigin(0,1)
+                .setScale((length-140)/70,height/140);
+            }else{
+                this.add.sprite(x+70,y,'chalkboard','boardTC')
+                .setOrigin(0)
+                .setScale((length-140)/70,1);
+                this.add.sprite(x+70,y+height,'chalkboard','boardBC')
+                .setOrigin(0,1)
+                .setScale((length-140)/70,1);
+            }
+        }
     }
 }
