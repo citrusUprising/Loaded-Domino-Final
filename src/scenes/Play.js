@@ -311,7 +311,7 @@ class Play extends Phaser.Scene {
 
         let musicPlayConfig = {
             mute: false,
-            volume: 0.6*game.settings.musicVolume,
+            volume: 0.5*game.settings.musicVolume,
             loop: true
         }
         //musicPlayConfig.volume = 0.6*game.settings.musicVolume;
@@ -567,7 +567,7 @@ class Play extends Phaser.Scene {
             if (Phaser.Input.Keyboard.JustDown(keyJUMP)) {
                 switch (this.selected) {
                     case "restart":
-                        this.bgm.volume =.6*game.settings.musicVolume;
+                        this.bgm.volume =.5*game.settings.musicVolume;
                         this.scene.restart();
                         break;
                     case "menu":
