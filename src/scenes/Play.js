@@ -214,17 +214,29 @@ class Play extends Phaser.Scene {
             repeat: 0
         }); 
 
-        /*this.anim.create({
+        this.anims.create({
             key: 'customerWalk',
             frames: this.anims.generateFrameNames("sprites", {
-                prefix: "customerWalk", //flag
+                prefix: "walk", //flag
                 start: 1,
-                end: ??,
+                end: 11,
                 zeroPad: 0
             }),
-            framerate: ??,
+            framerate: 20,
             repeat: -1
-        });*/
+        });
+
+        this.anims.create({
+            key: 'oozeSpike',
+            frames: this.anims.generateFrameNames("sprites", {
+                prefix: "spike", //flag
+                start: 1,
+                end: 13,
+                zeroPad: 0
+            }),
+            framerate: 12,
+            repeat: 0
+        });
 
         /*****************
          * set up timers *
@@ -611,11 +623,17 @@ class Play extends Phaser.Scene {
         // clean up shelves
         this.shelves.children.each(function(shelf) {
             if (shelf.y < this.ooze.y-shelf.height) {
-                shelf.destroy();
+                
                 // creep ooze down
                 if (!this.gameoverTop&&!this.gameoverBot) {//flag
                     this.oozeCreep();
+                    let warning = this.add.sprite(shelf.x, shelf.y+50, 'spritesheet', 'spike1').setOrigin(.5, 0);
+                    warning.anims.play('oozeSpike'); 
+                    warning.on('animationcomplete', () => {
+                        warning.destroy()
+                    });
                 } else console.log('ooze continues')
+                shelf.destroy();
             }
         }, this);
 
@@ -629,11 +647,16 @@ class Play extends Phaser.Scene {
         // clean up messes
         this.messes.children.each(function(mess) {
             if (mess.y < this.ooze.y-mess.height) {
-                mess.destroy();
                 // creep ooze down
                 if (!this.gameoverTop&&!this.gameoverBot) {//flag
                     this.oozeCreep();
+                    let warning = this.add.sprite(mess.x, mess.y, 'spritesheet', 'spike1').setOrigin(.5, 0);
+                    warning.anims.play('oozeSpike'); 
+                    warning.on('animationcomplete', () => {
+                        warning.destroy()
+                    });
                 } else console.log('ooze continues')
+                mess.destroy();
             }
         }, this);
 

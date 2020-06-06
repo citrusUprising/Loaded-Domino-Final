@@ -9,7 +9,7 @@ class Customer extends Phaser.GameObjects.Sprite {
         // save scene in var so we can reference it
         this.scene = scene;
 
-        //this.anims.play("customerWalk", true);
+        this.anims.play("customerWalk", true);
         this.isFlipped = false;
         this.run = 5500; //the duration a customer walks in one direction
 

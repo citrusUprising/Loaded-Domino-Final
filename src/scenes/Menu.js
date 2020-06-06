@@ -55,7 +55,7 @@ class Menu extends Phaser.Scene {
             'SHELVING CRISIS', titleConfig).setOrigin(0.5);*/
 
         //add menu backdrops
-        this.makeBlackboard(centerX-95,centerY-this.textSpacer,265,325,0);
+        this.makeBlackboard(centerX-95,centerY-this.textSpacer,275,340,0);
 
         // add titlescreen text
         
