@@ -93,6 +93,12 @@ class Preload extends Phaser.Scene {
         // load void atlas
         this.load.atlas("void", "assets/voidSheet.png", "assets/voidJson.json");
 
+        //load chalkboard atlas
+        this.load.atlas('chalkboard', "assets/boardsheet.png", "assets/boards.json");
+
+        //load chalk icon
+        this.load.image("selector", "assets/loose/chalk.png");
+
         // load music
         this.load.audio('menuMusic', 'assets/bgm/OnMyWay.mp3');
         this.load.audio('gameMusic', 'assets/bgm/TheShowMustBeGo.mp3');
