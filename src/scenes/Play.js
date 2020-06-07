@@ -283,7 +283,7 @@ class Play extends Phaser.Scene {
          * add player *
          **************/
 
-		this.player = new Player(this, game.config.width/2, 150, "sprites", "char").setOrigin(0.5);
+		this.player = new Player(this, game.config.width/2, 150, "sprites", "jump").setOrigin(0.5);
         this.physics.add.existing(this.player);
 
         // setup player physics
@@ -299,7 +299,7 @@ class Play extends Phaser.Scene {
          * add ooze *
          ************/
 
-        this.ooze = new Ooze(this, 0, -100, "voidStatic", 0).setOrigin(0, 0.33);
+        this.ooze = new Ooze(this, 0, -100, "void", "void0").setOrigin(0, 0.33);
         this.physics.add.existing(this.ooze);
         this.ooze.body.allowGravity = false;
         this.ooze.body.immovable = true;
@@ -379,227 +379,271 @@ class Play extends Phaser.Scene {
         keyUP = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.UP);
         keyDOWN = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.DOWN);
 
+        // create transition overlay
+        this.fader = this.add.rectangle (
+            0, 0, game.config.width, game.config.height,
+            0x000000
+        ).setOrigin(0,0).setAlpha(1).setDepth(999);
+        this.fading = "in";
+        this.intent = false;
+
     }
 
     update(time, delta) {
 
-        //update customers
-        this.customers.children.each(function(customer) {
-            customer.update();
-        }, this); //flag
-       
-        // if player hasn't died yet
-        if (!this.gameoverTop && !this.gameoverBot) {
- 
-            // update scrolling background
-            this.background.tilePositionY += this.scroll*delta*2/33;
- 
-            // update player
-            this.player.update();
-            this.player.isJump = true;
-
-            // update ooze
-            this.ooze.update();
-
-            //flip sprite when player turns
-            if (this.player.isTurn) { 
-                //console.log('turning');
-                this.player.toggleFlipX();
-                this.player.isTurn = false;
+        if (this.fading == "in") {
+            
+            if (this.fader.alpha - game.settings.t8nSpeed <= 0) {
+                // js lets me do this and im crazy enough to do it
+                this.fading = false;
+                this.fader.setAlpha(0);
+                console.log(this.fader.alpha);
+            } else {
+                this.fader.setAlpha(this.fader.alpha - game.settings.t8nSpeed);
             }
 
-            // face angry customers
-            this.agCustomers.children.each(function(agCustomer) {
-                if (agCustomer.x < this.player.x) {
-                    agCustomer.setFlipX(false);
-                } else {
-                    agCustomer.setFlipX(true);
-                }
-            }, this);
+        } else if (this.fading == "out") {
 
-            // check if player died
-            // give player some leeway so they don't get eaten by particles
-            if (this.player.y < this.ooze.y-80) {
-                this.gameoverTop = true;
-            } else if (this.player.y > game.config.height+50) {
-                this.gameoverBot = true;
+            if (this.fader.alpha + game.settings.t8nSpeed >= 1) {
+                this.fading = false;
+                this.fader.setAlpha(1);
+                if (this.intent != false) {
+                    switch (this.intent) {
+                        case "restart":
+                            this.bgm.volume =.5*game.settings.musicVolume;
+                            this.scene.restart();
+                            break;
+                        case "menu":
+                            game.settings.playing = false;
+                            this.bgm.stop();
+                            this.scene.start("menuScene");
+                            break;
+                    }
+                }
+            } else {
+                this.fader.setAlpha(this.fader.alpha + game.settings.t8nSpeed);
             }
 
-            // if player *just* died, perform,, the rituals
-            if (this.gameoverTop || this.gameoverBot) {
-
-                // turn off player movement
-                this.player.body.velocity.x = 0;
-                this.player.body.velocity.y = 0;
-                this.player.body.bounce.x = 0;
-                this.player.body.bounce.y = 0;
-                this.player.body.allowGravity = false;
-
-                // stop *everything*
-                this.platformTimer.paused = true;
-                this.scroll = 0; //flag
-
-                this.platforms.children.each(function(platform) {
-                    platform.body.velocity.y = 0;
-                }, this);
-
-                this.boxes.children.each(function(box) {
-                    box.body.velocity.y = 0;
-                }, this);
-
-                this.shelves.children.each(function(shelf) {
-                    shelf.body.velocity.y = 0;
-                }, this);
-
-                this.fullShelves.children.each(function(fullShelf) {
-                    fullShelf.body.velocity.y = 0;
-                }, this);
-
-                this.messes.children.each(function(mess) {
-                    mess.body.velocity.y = 0;
-                }, this);
-
-                /*this.customers.children.each(function(customer) {
-                    customer.body.velocity.y = 0;
-                }, this);*/ //flag
-
-                this.agCustomers.children.each(function(agCustomer) {
-                    agCustomer.body.velocity.y = 0;
-                }, this);
-
-                // final score
-                this.finScore = this.score;
-
-                // quiet bgm
-                this.bgm.volume = 0.2*game.settings.musicVolume;
-
-                // text spacer for game over text
-                // kludge
-                this.textSpacer = 60;
-                let textSpacer = 60;
-
-                // create game over text
-                // note 2 cam from cam: clean this up, remove magic #s -love, cam
-                if(this.gameoverTop){
-                    this.add.rectangle (
-                        game.config.width/2, game.config.height/2,
-                        500, 400, 0x000000
-                    ).setOrigin(0.5);
-                }else{
-                    this.makeBlackboard(
-                        game.config.width/2, game.config.height/2,
-                        500,400,.5);
-                }
-                
-                this.add.text (
-                    game.config.width/2, (game.config.height/2)-(2*textSpacer),
-                    "Game Over", this.gameOverHeaderConfig
-                ).setOrigin(0.5);
-                
-                // because im fuckinge crazie
-                let secs;
-                if (this.finScore == 1) {
-                    secs = " second";
-                } else {
-                    secs = " seconds";
-                }
-
-                this.add.text (
-                    game.config.width/2, game.config.height/2,
-                    "after only " + this.finScore + secs + " at work",
-                    this.gameOverInfoConfig
-                ).setOrigin(0.5);
-
-                this.add.text (
-                    game.config.width/2-80, game.config.height/2+textSpacer,
-                    "Try again", this.gameOverInstructionsConfig
-                )
-
-                this.add.text (
-                    game.config.width/2-80, game.config.height/2+2*textSpacer,
-                    "Return to menu", this.gameOverInstructionsConfig
-                );
-    
-                // add selector
-                this.selectorText = this.add.sprite (
-                    game.config.width/2-90, game.config.height/2+textSpacer, 
-                    "selector").setOrigin(1,0);
-
-                if (this.gameoverTop) {
-
-                    this.add.text (
-                        game.config.width/2, game.config.height/2-textSpacer,
-                        'You were consumed by the void', this.gameOverInfoConfig
-                    ).setOrigin(0.5);
-
-                    // cover screen with ooze
-                    this.ooze.body.setVelocityY(game.settings.oozeSpeed*10);
-                
-                    // om nom nom ( ิ౪ ิ)っ─∈
-                    this.sound.play("sfxConsume", {volume: 0.4*game.settings.effectVolume});
-                    
-                } else if (this.gameoverBot) {
-
-                    this.add.text (
-                        game.config.width/2, game.config.height/2-textSpacer,
-                        'You fell to your death', this.gameOverInfoConfig
-                    ).setOrigin(0.5);
-
-                    // aaaaaaaaaaaaaaaaaa
-                    this.sound.play("sfxFall", {volume: 0.4*game.settings.effectVolume});
-                
-                }
-                
-            }
-    
-        // else, if player's dead
         } else {
-
-            // handle menu
-            if (Phaser.Input.Keyboard.JustDown(keyUP)) {
-                switch (this.selected) {
-                    case "menu":
-                        this.selected = "restart";
-                        this.selectorText.y -= this.textSpacer;
-                        this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
-                        break;
-                }
-            }
+            
+            //update customers
+            this.customers.children.each(function(customer) {
+                customer.update();
+            }, this); //flag
+        
+            // if player hasn't died yet
+            if (!this.gameoverTop && !this.gameoverBot) {
     
-            if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
-                switch (this.selected) {
-                    case "restart":
-                        this.selected = "menu";
-                        this.selectorText.y += this.textSpacer;
-                        this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
-                        break;
-                }
-            }
+                // update scrolling background
+                this.background.tilePositionY += this.scroll*delta*2/33;
     
-            if (Phaser.Input.Keyboard.JustDown(keyJUMP)) {
-                switch (this.selected) {
-                    case "restart":
-                        this.bgm.volume =.5*game.settings.musicVolume;
-                        this.scene.restart();
-                        break;
-                    case "menu":
-                        game.settings.playing = false;
-                        this.bgm.stop();
-                        this.scene.start("menuScene");
-                        break;
+                // update player
+                this.player.update();
+                this.player.isJump = true;
+
+                // update ooze
+                this.ooze.update();
+
+                //flip sprite when player turns
+                if (this.player.isTurn) { 
+                    //console.log('turning');
+                    this.player.toggleFlipX();
+                    this.player.isTurn = false;
                 }
+
+                // face angry customers
+                this.agCustomers.children.each(function(agCustomer) {
+                    if (agCustomer.x < this.player.x) {
+                        agCustomer.setFlipX(false);
+                    } else {
+                        agCustomer.setFlipX(true);
+                    }
+                }, this);
+
+                // check if player died
+                // give player some leeway so they don't get eaten by particles
+                if (this.player.y < this.ooze.y-80) {
+                    this.gameoverTop = true;
+                } else if (this.player.y > game.config.height+50) {
+                    this.gameoverBot = true;
+                }
+
+                // if player *just* died, perform,, the rituals
+                if (this.gameoverTop || this.gameoverBot) {
+
+                    // turn off player movement
+                    this.player.body.velocity.x = 0;
+                    this.player.body.velocity.y = 0;
+                    this.player.body.bounce.x = 0;
+                    this.player.body.bounce.y = 0;
+                    this.player.body.allowGravity = false;
+
+                    // stop *everything*
+                    this.platformTimer.paused = true;
+                    this.scroll = 0; //flag
+
+                    this.platforms.children.each(function(platform) {
+                        platform.body.velocity.y = 0;
+                    }, this);
+
+                    this.boxes.children.each(function(box) {
+                        box.body.velocity.y = 0;
+                    }, this);
+
+                    this.shelves.children.each(function(shelf) {
+                        shelf.body.velocity.y = 0;
+                    }, this);
+
+                    this.fullShelves.children.each(function(fullShelf) {
+                        fullShelf.body.velocity.y = 0;
+                    }, this);
+
+                    this.messes.children.each(function(mess) {
+                        mess.body.velocity.y = 0;
+                    }, this);
+
+                    /*this.customers.children.each(function(customer) {
+                        customer.body.velocity.y = 0;
+                    }, this);*/ //flag
+
+                    this.agCustomers.children.each(function(agCustomer) {
+                        agCustomer.body.velocity.y = 0;
+                    }, this);
+
+                    // final score
+                    this.finScore = this.score;
+
+                    // quiet bgm
+                    this.bgm.volume = 0.2*game.settings.musicVolume;
+
+                    // text spacer for game over text
+                    // kludge
+                    this.textSpacer = 60;
+                    let textSpacer = 60;
+
+                    // create game over text
+                    // note 2 cam from cam: clean this up, remove magic #s -love, cam
+                    if(this.gameoverTop){
+                        this.add.rectangle (
+                            game.config.width/2, game.config.height/2,
+                            500, 400, 0x000000
+                        ).setOrigin(0.5);
+                    }else{
+                        this.makeBlackboard(
+                            game.config.width/2, game.config.height/2,
+                            500,400,.5);
+                    }
+                    
+                    this.add.text (
+                        game.config.width/2, (game.config.height/2)-(2*textSpacer),
+                        "Game Over", this.gameOverHeaderConfig
+                    ).setOrigin(0.5);
+                    
+                    // because im fuckinge crazie
+                    let secs;
+                    if (this.finScore == 1) {
+                        secs = " second";
+                    } else {
+                        secs = " seconds";
+                    }
+
+                    this.add.text (
+                        game.config.width/2, game.config.height/2,
+                        "after only " + this.finScore + secs + " at work",
+                        this.gameOverInfoConfig
+                    ).setOrigin(0.5);
+
+                    this.add.text (
+                        game.config.width/2-80, game.config.height/2+textSpacer,
+                        "Try again", this.gameOverInstructionsConfig
+                    )
+
+                    this.add.text (
+                        game.config.width/2-80, game.config.height/2+2*textSpacer,
+                        "Return to menu", this.gameOverInstructionsConfig
+                    );
+        
+                    // add selector
+                    this.selectorText = this.add.sprite (
+                        game.config.width/2-90, game.config.height/2+textSpacer, 
+                        "selector").setOrigin(1,0);
+
+                    if (this.gameoverTop) {
+
+                        this.add.text (
+                            game.config.width/2, game.config.height/2-textSpacer,
+                            'You were consumed by the void', this.gameOverInfoConfig
+                        ).setOrigin(0.5);
+
+                        // cover screen with ooze
+                        this.ooze.body.setVelocityY(game.settings.oozeSpeed*10);
+                    
+                        // om nom nom ( ิ౪ ิ)っ─∈
+                        this.sound.play("sfxConsume", {volume: 0.4*game.settings.effectVolume});
+                        
+                    } else if (this.gameoverBot) {
+
+                        this.add.text (
+                            game.config.width/2, game.config.height/2-textSpacer,
+                            'You fell to your death', this.gameOverInfoConfig
+                        ).setOrigin(0.5);
+
+                        // aaaaaaaaaaaaaaaaaa
+                        this.sound.play("sfxFall", {volume: 0.4*game.settings.effectVolume});
+                    
+                    }
+                    
+                }
+        
+            // else, if player's dead
+            } else {
+
+                // handle menu
+                if (Phaser.Input.Keyboard.JustDown(keyUP)) {
+                    switch (this.selected) {
+                        case "menu":
+                            this.selected = "restart";
+                            this.selectorText.y -= this.textSpacer;
+                            this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
+                            break;
+                    }
+                }
+        
+                if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
+                    switch (this.selected) {
+                        case "restart":
+                            this.selected = "menu";
+                            this.selectorText.y += this.textSpacer;
+                            this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
+                            break;
+                    }
+                }
+        
+                if (Phaser.Input.Keyboard.JustDown(keyJUMP)) {
+                    switch (this.selected) {
+                        case "restart":
+                            this.fading = "out";
+                            this.intent = "restart";
+                            break;
+                        case "menu":
+                            this.fading = "out";
+                            this.intent = "menu";
+                            break;
+                    }
+                }
+
+            } 
+
+            // prevent ooze from going off screen
+            if (this.ooze.y > game.config.height) {
+                this.stopOoze();
             }
 
-        } 
+            // move ooze mass where it needs to be
+            this.oozeMass.y = this.ooze.y - game.config.height - 100;
 
-        // prevent ooze from going off screen
-        if (this.ooze.y > game.config.height) {
-            this.stopOoze();
         }
-
-        // move ooze mass where it needs to be
-        this.oozeMass.y = this.ooze.y - game.config.height - 100;
-
+    
     }
 
     // cleanUp()

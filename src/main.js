@@ -46,6 +46,7 @@ game.settings = {
 	bgm: null,
 	musicVolume: 0.5,
 	effectVolume: 0.5,
+	t8nSpeed: 0.05
 }
 
 // define key constants

@@ -10,6 +10,14 @@ class Credits extends Phaser.Scene {
 
     create() {
 
+        // create transition overlay
+        this.fader = this.add.rectangle (
+            0, 0, game.config.width, game.config.height,
+            0x000000
+        ).setOrigin(0,0).setAlpha(1).setDepth(999);
+        this.fading = "in";
+        this.intent = false;
+
         this.backdrop = this.add.sprite(0, 0, "settingsBack").setOrigin(0,0);
 
         let menuConfig = {
@@ -104,18 +112,42 @@ class Credits extends Phaser.Scene {
 
     update() {
 
+        if (this.fading == "in") {
+            
+            if (this.fader.alpha - game.settings.t8nSpeed <= 0) {
+                // js lets me do this and im crazy enough to do it
+                this.fading = false;
+                this.fader.setAlpha(0);
+                console.log(this.fader.alpha);
+            } else {
+                this.fader.setAlpha(this.fader.alpha - game.settings.t8nSpeed);
+            }
+
+        } else if (this.fading == "out") {
+
+            if (this.fader.alpha + game.settings.t8nSpeed >= 1) {
+                this.fading = false;
+                this.fader.setAlpha(1);
+                if (this.intent != false) {
+                    switch (this.intent) {
+                        case "menu":
+                            this.scene.start("menuScene");
+                            break;
+                    }
+                }
+            } else {
+                this.fader.setAlpha(this.fader.alpha + game.settings.t8nSpeed);
+            }
+
+        } else {
+
             //back returns to menu
             if(Phaser.Input.Keyboard.JustDown(keyBACK)) {
-                this.scene.start("menuScene");
+                this.fading = "out";
+                this.intent = "menu";
             }
-            /*
-            //right starts game
-            if(Phaser.Input.Keyboard.JustDown(keyRIGHT)) {
-                game.settings.bgm.stop();
-                game.settings.tutorOpen = false;
-                this.scene.start("playScene");
-            }
-            */
+            
+        }
         
     }
 }

@@ -326,167 +326,210 @@ class Tutorial extends Phaser.Scene {
             "Use [Z] to jump"
         );
 
+        // create transition overlay
+        this.fader = this.add.rectangle (
+            0, 0, game.config.width, game.config.height,
+            0x000000
+        ).setOrigin(0,0).setAlpha(1).setDepth(999);
+        this.fading = "in";
+        this.intent = false;
+
     }
 
     update(time, delta) {
 
-        // if player hasn't died yet
-        if (!this.gameoverBot) {
-
-            // update player
-            this.player.update();
-            this.player.isJump = true;
-
-            //flip sprite when player turns
-            if (this.player.isTurn) { 
-                //console.log('turning');
-                this.player.toggleFlipX();
-                this.player.isTurn = false;
+        if (this.fading == "in") {
+            
+            if (this.fader.alpha - game.settings.t8nSpeed <= 0) {
+                // js lets me do this and im crazy enough to do it
+                this.fading = false;
+                this.fader.setAlpha(0);
+                console.log(this.fader.alpha);
+            } else {
+                this.fader.setAlpha(this.fader.alpha - game.settings.t8nSpeed);
             }
 
-            //check for text spawning
-            //box
-            if(this.player.y<150){
-                if(this.player.x<2*this.platWidth+100&&this.player.x>2*this.platWidth-100&&!this.checkBox){
-                        this.makeText(2*this.platWidth,150-this.promptOffset,310,90,1,1,
-                            "Use [X] to pick up Boxes",
-                            "and take them to Shelves",
-                            "you move slower while carrying Boxes"
-                        );
-                        this.checkBox = true;
+        } else if (this.fading == "out") {
+
+            if (this.fader.alpha + game.settings.t8nSpeed >= 1) {
+                this.fading = false;
+                this.fader.setAlpha(1);
+                if (this.intent != false) {
+                    switch (this.intent) {
+                        case "play":
+                            game.settings.bgm.stop();
+                            game.settings.tutorOpen = false;
+                            this.scene.start("playScene");   
+                            break;
+                        case "menu":
+                            this.scene.start("menuScene");
+                            break;
+                    }
                 }
+            } else {
+                this.fader.setAlpha(this.fader.alpha + game.settings.t8nSpeed);
             }
-            //shelf
-            if(this.player.y<150+3*this.platDist&&this.player.y>3*this.platDist-50){
-                if(this.player.x<150&&this.player.x>-50&&!this.checkShelf){
-                    this.makeText(50+this.promptOffset, 150+3*this.platDist-this.promptOffset,215,90,0,1,//check
-                        "Bring Boxes here",
-                        "use [X] to shelve Boxes",
-                        "It takes a little time to do"
-                    );
-                    this.checkShelf = true;
-                }
-            }
-            //mess
-            if(this.player.y<150+this.platDist&&this.player.y>this.platDist){
-                if(this.player.x<50+2*this.platWidth+100&&this.player.x>50+2*this.platWidth-100&&!this.checkMess){
-                    this.makeText(50+2*this.platWidth, 150+this.platDist-this.promptOffset,260,90,0,1,//check
-                        "Clean up Messes you encounter",
-                        "use [X] to clean",
-                        "cleaning takes time"
-                    );
-                    this.checkMess = true;
-                }
-            }
-
-
-            // check if player finished training and is in end area
-            if (this.player.y >150+2*this.platDist&&this.player.x >game.config.width-100&&this.finish<=0) {
-                this.gameoverBot = true;
-                this.physics.world.setBounds(0, -100, game.config.width+50, game.config.height+200);
-            }
-
-            // if player *just* died, perform,, the rituals
-            if (this.gameoverBot) {
-
-                // turn off player movement
-                this.player.body.velocity.x = 300;
-                this.player.body.velocity.y = 0;
-                this.player.body.bounce.x = 0;
-                this.player.body.bounce.y = 0;
-                this.player.body.allowGravity = false;
-
-                // hide scoreboard
-                //this.scoreBoard.setVisible(false);
-
-                // final score
-                //this.finScore = this.score;
-
-                // text spacer for game over text
-                let textSpacer = 60;
-                // kluuuuudddddgggeeee
-                this.textSpacer = textSpacer;
-
-                // create game over text
-                // note 2 cam from cam: clean this up, remove magic #s -love, cam
-                this.makeBlackboard (
-                    game.config.width/2, game.config.height/2,
-                    500, 360, 0, .5
-                );
-                
-                // this is a really funny way to do this
-                this.add.text (
-                    game.config.width/2, (game.config.height/2)-(2*textSpacer),
-                    "Training Complete!", this.gameOverHeaderConfig
-                ).setOrigin(0.5);
-
-                this.add.text (
-                    game.config.width/2, (game.config.height/2)-(textSpacer),
-                    "Now you're ready",
-                    this.gameOverInfoConfig
-                ).setOrigin(0.5);
-                
-                this.add.text (
-                    game.config.width/2, game.config.height/2,
-                    "to begin working here!",
-                    this.gameOverInfoConfig
-                ).setOrigin(0.5);
-
-                this.add.text (
-                    game.config.width/2-80, game.config.height/2+textSpacer,
-                    "Start your shift", this.gameOverInstructionsConfig
-                );
-
-                this.add.text (
-                    game.config.width/2-80, game.config.height/2+2*textSpacer,
-                    "Return to menu", this.gameOverInstructionsConfig
-                );
-   
-                // add selector
-                this.selectorText = this.add.sprite (
-                    game.config.width/2-90, game.config.height/2+textSpacer, 
-                    "selector").setOrigin(1,0);
-                
-            }
-    
-        // else, if player's dead
+            
         } else {
 
-            // handle menu
-            if (Phaser.Input.Keyboard.JustDown(keyUP)) {
-                switch (this.selected) {
-                    case "menu":
-                        this.selected = "play";
-                        this.selectorText.y -= this.textSpacer;
-                        this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
-                        break;
-                }
-            }
+            // if player hasn't died yet
+            if (!this.gameoverBot) {
 
-            if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
-                switch (this.selected) {
-                    case "play":
-                        this.selected = "menu";
-                        this.selectorText.y += this.textSpacer;
-                        this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
-                        break;
-                }
-            }
+                // update player
+                this.player.update();
+                this.player.isJump = true;
 
-            if (Phaser.Input.Keyboard.JustDown(keyJUMP)) {
-                switch (this.selected) {
-                    case "play":
-                        game.settings.bgm.stop();
-                        game.settings.tutorOpen = false;
-                        this.scene.start("playScene");   
-                        break;
-                    case "menu":
-                        this.scene.start("menuScene");
-                        break;
+                //flip sprite when player turns
+                if (this.player.isTurn) { 
+                    //console.log('turning');
+                    this.player.toggleFlipX();
+                    this.player.isTurn = false;
                 }
-            }
-        } 
 
+                //check for text spawning
+                //box
+                if(this.player.y<150){
+                    if(this.player.x<2*this.platWidth+100&&this.player.x>2*this.platWidth-100&&!this.checkBox){
+                            this.makeText(2*this.platWidth,150-this.promptOffset,310,90,1,1,
+                                "Use [X] to pick up Boxes",
+                                "and take them to Shelves",
+                                "you move slower while carrying Boxes"
+                            );
+                            this.checkBox = true;
+                    }
+                }
+                //shelf
+                if(this.player.y<150+3*this.platDist&&this.player.y>3*this.platDist-50){
+                    if(this.player.x<150&&this.player.x>-50&&!this.checkShelf){
+                        this.makeText(50+this.promptOffset, 150+3*this.platDist-this.promptOffset,215,90,0,1,//check
+                            "Bring Boxes here",
+                            "use [X] to shelve Boxes",
+                            "It takes a little time to do"
+                        );
+                        this.checkShelf = true;
+                    }
+                }
+                //mess
+                if(this.player.y<150+this.platDist&&this.player.y>this.platDist){
+                    if(this.player.x<50+2*this.platWidth+100&&this.player.x>50+2*this.platWidth-100&&!this.checkMess){
+                        this.makeText(50+2*this.platWidth, 150+this.platDist-this.promptOffset,260,90,0,1,//check
+                            "Clean up Messes you encounter",
+                            "use [X] to clean",
+                            "cleaning takes time"
+                        );
+                        this.checkMess = true;
+                    }
+                }
+
+
+                // check if player finished training and is in end area
+                if (this.player.y >150+2*this.platDist&&this.player.x >game.config.width-100&&this.finish<=0) {
+                    this.gameoverBot = true;
+                    this.physics.world.setBounds(0, -100, game.config.width+50, game.config.height+200);
+                }
+
+                // if player *just* died, perform,, the rituals
+                if (this.gameoverBot) {
+
+                    // turn off player movement
+                    this.player.body.velocity.x = 300;
+                    this.player.body.velocity.y = 0;
+                    this.player.body.bounce.x = 0;
+                    this.player.body.bounce.y = 0;
+                    this.player.body.allowGravity = false;
+
+                    // hide scoreboard
+                    //this.scoreBoard.setVisible(false);
+
+                    // final score
+                    //this.finScore = this.score;
+
+                    // text spacer for game over text
+                    let textSpacer = 60;
+                    // kluuuuudddddgggeeee
+                    this.textSpacer = textSpacer;
+
+                    // create game over text
+                    // note 2 cam from cam: clean this up, remove magic #s -love, cam
+                    this.makeBlackboard (
+                        game.config.width/2, game.config.height/2,
+                        500, 360, 0, .5
+                    );
+                    
+                    // this is a really funny way to do this
+                    this.add.text (
+                        game.config.width/2, (game.config.height/2)-(2*textSpacer),
+                        "Training Complete!", this.gameOverHeaderConfig
+                    ).setOrigin(0.5);
+
+                    this.add.text (
+                        game.config.width/2, (game.config.height/2)-(textSpacer),
+                        "Now you're ready",
+                        this.gameOverInfoConfig
+                    ).setOrigin(0.5);
+                    
+                    this.add.text (
+                        game.config.width/2, game.config.height/2,
+                        "to begin working here!",
+                        this.gameOverInfoConfig
+                    ).setOrigin(0.5);
+
+                    this.add.text (
+                        game.config.width/2-80, game.config.height/2+textSpacer,
+                        "Start your shift", this.gameOverInstructionsConfig
+                    );
+
+                    this.add.text (
+                        game.config.width/2-80, game.config.height/2+2*textSpacer,
+                        "Return to menu", this.gameOverInstructionsConfig
+                    );
+    
+                    // add selector
+                    this.selectorText = this.add.sprite (
+                        game.config.width/2-90, game.config.height/2+textSpacer, 
+                        "selector").setOrigin(1,0);
+                    
+                }
+        
+            // else, if player's dead
+            } else {
+
+                // handle menu
+                if (Phaser.Input.Keyboard.JustDown(keyUP)) {
+                    switch (this.selected) {
+                        case "menu":
+                            this.selected = "play";
+                            this.selectorText.y -= this.textSpacer;
+                            this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
+                            break;
+                    }
+                }
+
+                if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
+                    switch (this.selected) {
+                        case "play":
+                            this.selected = "menu";
+                            this.selectorText.y += this.textSpacer;
+                            this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
+                            break;
+                    }
+                }
+
+                if (Phaser.Input.Keyboard.JustDown(keyJUMP)) {
+                    switch (this.selected) {
+                        case "play":
+                            this.fading = "out";
+                            this.intent = "play";
+                            break;
+                        case "menu":
+                            this.fading = "out";
+                            this.intent = "menu";
+                            break;
+                    }
+                }
+            } 
+
+        }
     }
 
    /******************************

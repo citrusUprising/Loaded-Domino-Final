@@ -6,6 +6,14 @@ class Menu extends Phaser.Scene {
 
     create() {
 
+        // create transition overlay
+        this.fader = this.add.rectangle (
+            0, 0, game.config.width, game.config.height,
+            0x000000
+        ).setOrigin(0,0).setAlpha(1).setDepth(999);
+        this.fading = "in";
+        this.intent = false;
+
         // menu cursor location
         if(!game.settings.trained){
             this.selected = "tutorial";
@@ -135,16 +143,78 @@ class Menu extends Phaser.Scene {
         //    this.scene.start("tutorialScene");
         //}
 
-        if (Phaser.Input.Keyboard.JustDown(keyUP)) {
-            if(!game.settings.trained){
+        if (this.fading == "in") {
+            
+            if (this.fader.alpha - game.settings.t8nSpeed <= 0) {
+                // js lets me do this and im crazy enough to do it
+                this.fading = false;
+                this.fader.setAlpha(0);
+                //console.log(this.fader.alpha);
+            } else {
+                this.fader.setAlpha(this.fader.alpha - game.settings.t8nSpeed);
+            }
+
+        } else if (this.fading == "out") {
+
+            if (this.fader.alpha + game.settings.t8nSpeed >= 1) {
+                this.fading = false;
+                this.fader.setAlpha(1);
+                if (this.intent != false) {
+                    switch (this.intent) {
+                        case "play":
+                            game.settings.bgm.stop();
+                            game.settings.tutorOpen = false;
+                            this.scene.start("playScene");
+                            break;
+                        case "tutorial":
+                            game.settings.tutorOpen = true;
+                            game.settings.trained = true;
+                            this.scene.start("tutorialScene");
+                            break;
+                        case "settings":
+                            game.settings.tutorOpen = true;
+                            this.scene.start("settingScene");
+                            break;
+                        case "credits":
+                            game.settings.tutorOpen = true;
+                            this.scene.start("creditScene");
+                            break;    
+                    }
+                }
+            } else {
+                this.fader.setAlpha(this.fader.alpha + game.settings.t8nSpeed);
+            }
+
+        } else {
+
+            if (Phaser.Input.Keyboard.JustDown(keyUP)) {
+                if(!game.settings.trained){
+                    switch (this.selected) {
+                        case "play":
+                            this.selected = "tutorial";
+                            this.selectorText.y -= this.textSpacer;
+                            this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
+                            break;
+                        case "settings":
+                            this.selected = "play";
+                            this.selectorText.y -= this.textSpacer;
+                            this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
+                            break;
+                        case "credits":
+                            this.selected = "settings";
+                            this.selectorText.y -= this.textSpacer;
+                            this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
+                            break;
+                        }
+                }else{
                 switch (this.selected) {
-                    case "play":
-                        this.selected = "tutorial";
+                    case "tutorial":
+                        this.selected = "play";
                         this.selectorText.y -= this.textSpacer;
                         this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                         break;
                     case "settings":
-                        this.selected = "play";
+                        this.selected = "tutorial";
                         this.selectorText.y -= this.textSpacer;
                         this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                         break;
@@ -154,36 +224,36 @@ class Menu extends Phaser.Scene {
                         this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                         break;
                     }
-            }else{
-            switch (this.selected) {
-                case "tutorial":
-                    this.selected = "play";
-                    this.selectorText.y -= this.textSpacer;
-                    this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
-                    break;
-                case "settings":
-                    this.selected = "tutorial";
-                    this.selectorText.y -= this.textSpacer;
-                    this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
-                    break;
-                case "credits":
-                    this.selected = "settings";
-                    this.selectorText.y -= this.textSpacer;
-                    this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
-                    break;
                 }
             }
-        }
 
-        if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
-            if(!game.settings.trained){
+            if (Phaser.Input.Keyboard.JustDown(keyDOWN)) {
+                if(!game.settings.trained){
+                    switch (this.selected) {
+                        case "tutorial":
+                            this.selected = "play";
+                            this.selectorText.y += this.textSpacer;
+                            this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
+                            break;
+                        case "play":
+                            this.selected = "settings";
+                            this.selectorText.y += this.textSpacer;
+                            this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
+                            break;
+                        case "settings":
+                            this.selected = "credits";
+                            this.selectorText.y += this.textSpacer;
+                            this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
+                            break;
+                        }
+                }else{
                 switch (this.selected) {
-                    case "tutorial":
-                        this.selected = "play";
+                    case "play":
+                        this.selected = "tutorial";
                         this.selectorText.y += this.textSpacer;
                         this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                         break;
-                    case "play":
+                    case "tutorial":
                         this.selected = "settings";
                         this.selectorText.y += this.textSpacer;
                         this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
@@ -194,47 +264,28 @@ class Menu extends Phaser.Scene {
                         this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
                         break;
                     }
-            }else{
-            switch (this.selected) {
-                case "play":
-                    this.selected = "tutorial";
-                    this.selectorText.y += this.textSpacer;
-                    this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
-                    break;
-                case "tutorial":
-                    this.selected = "settings";
-                    this.selectorText.y += this.textSpacer;
-                    this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
-                    break;
-                case "settings":
-                    this.selected = "credits";
-                    this.selectorText.y += this.textSpacer;
-                    this.sound.play("sfxUIClick", {volume: 0.8*game.settings.effectVolume});
-                    break;
                 }
             }
-        }
 
-        if (Phaser.Input.Keyboard.JustDown(keySELECT)) {
-            switch (this.selected) {
-                case "play":
-                    game.settings.bgm.stop();
-                    game.settings.tutorOpen = false;
-                    this.scene.start("playScene");
-                    break;
-                case "tutorial":
-                    game.settings.tutorOpen = true;
-                    game.settings.trained = true;
-                    this.scene.start("tutorialScene");
-                    break;
-                case "settings":
-                    game.settings.tutorOpen = true;
-                    this.scene.start("settingScene");
-                    break;
-                case "credits":
-                    game.settings.tutorOpen = true;
-                    this.scene.start("creditScene");
-                    break;
+            if (Phaser.Input.Keyboard.JustDown(keySELECT)) {
+                switch (this.selected) {
+                    case "play":
+                        this.fading = "out";
+                        this.intent = "play";
+                        break;
+                    case "tutorial":
+                        this.fading = "out";
+                        this.intent = "tutorial";
+                        break;
+                    case "settings":
+                        this.fading = "out";
+                        this.intent = "settings";
+                        break;
+                    case "credits":
+                        this.fading = "out";
+                        this.intent = "credits";
+                        break;
+                }
             }
         }
 
